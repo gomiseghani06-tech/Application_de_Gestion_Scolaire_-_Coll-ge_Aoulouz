@@ -1,0 +1,4505 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="tool">
+  <meta name="design-style" content="carbon">
+  <title>Gestion et Suivi Scolaire — Collège Aoulouz</title>
+
+  <!-- Google Fonts: IBM Plex Sans, IBM Plex Mono & Cairo for authentic Arabic script -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons (Approved CDN) -->
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page & Surfaces (Carbon Design Tokens) */
+      --background: #f8fafc;
+      --surface: #ffffff;
+      --surface-container-low: #f8fafc;
+      --surface-container: #f1f5f9;
+      --surface-container-high: #e2e8f0;
+
+      /* Ink */
+      --on-surface: #0f172a;
+      --on-surface-variant: #475569;
+      --text-muted: #64748b;
+
+      /* Rules */
+      --outline: #94a3b8;
+      --outline-variant: #e2e8f0;
+
+      /* Institutional Palette (Moroccan Royal Navy & Emerald Green) */
+      --primary: #1e3a8a;               /* Moroccan Navy Blue */
+      --primary-hover: #1e40af;
+      --on-primary: #ffffff;
+      --primary-container: #dbeafe;
+      --on-primary-container: #1e3a8a;
+
+      --secondary: #047857;             /* Moroccan Green */
+      --secondary-hover: #065f46;
+      --on-secondary: #ffffff;
+      --secondary-container: #d1fae5;
+      --on-secondary-container: #064e3b;
+
+      --tertiary: #0284c7;              /* Cyan/Blue Info */
+      --tertiary-container: #e0f2fe;
+
+      --error: #dc2626;                 /* Red Danger */
+      --on-error: #ffffff;
+      --error-container: #fee2e2;
+      --on-error-container: #991b1b;
+
+      --warning: #d97706;               /* Amber Warning */
+      --warning-container: #fef3c7;
+      --on-warning-container: #92400e;
+
+      /* Data series */
+      --data-1: #1e3a8a;
+      --data-2: #047857;
+      --data-3: #d97706;
+      --data-4: #7c3aed;
+      --data-context: #94a3b8;
+
+      /* Fonts */
+      --font-headline: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-label: 'IBM Plex Mono', monospace;
+      --font-arabic: 'Cairo', 'IBM Plex Sans', sans-serif;
+
+      /* Spacing Scale */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+
+      /* Borders & Shadows */
+      --radius-sm: 2px;
+      --radius-md: 4px;
+      --radius-lg: 6px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      font-family: var(--font-body);
+      background-color: var(--background);
+      color: var(--on-surface);
+      line-height: 1.5;
+      overflow-x: clip;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-arabic {
+      font-family: var(--font-arabic);
+      direction: rtl;
+    }
+
+    .font-mono {
+      font-family: var(--font-label);
+    }
+
+    /* Layout Container */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Institutional Header Banner */
+    .gov-banner {
+      background: linear-gradient(90deg, #1e3a8a 0%, #1e40af 50%, #047857 100%);
+      color: #ffffff;
+      padding: var(--space-xs) var(--space-md);
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #fbbf24; /* Moroccan gold accent */
+    }
+
+    .gov-banner-text {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .gov-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+    }
+
+    /* Main Application Header */
+    .app-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--outline-variant);
+      padding: var(--space-md) var(--space-lg);
+      box-shadow: var(--shadow-sm);
+      position: static;
+      z-index: 40;
+    }
+
+    .header-content {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .ministry-logo-svg {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+    }
+
+    .brand-titles h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      letter-spacing: -0.02em;
+    }
+
+    .brand-titles .school-name {
+      font-size: 13px;
+      color: var(--on-surface-variant);
+      display: flex;
+      gap: var(--space-sm);
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    .school-name span.arabic {
+      font-family: var(--font-arabic);
+      font-weight: 600;
+      color: var(--secondary);
+    }
+
+    /* Teacher Profile Widget in Header */
+    .teacher-badge-container {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      background: var(--surface-container);
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--outline-variant);
+    }
+
+    .teacher-avatar-frame {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--primary);
+      overflow: hidden;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .teacher-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .teacher-info {
+      text-align: left;
+    }
+
+    .teacher-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--on-surface);
+      line-height: 1.2;
+    }
+
+    .teacher-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .status-dot-pulse {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--secondary);
+    }
+
+    /* Top Navigation Tabs */
+    .nav-tabs-bar {
+      background: var(--surface);
+      border-bottom: 2px solid var(--outline-variant);
+      padding: 0 var(--space-lg);
+    }
+
+    .nav-tabs-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      gap: var(--space-xs);
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+
+    .nav-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: var(--transition);
+    }
+
+    .nav-tab-btn:hover {
+      color: var(--primary);
+      background: var(--surface-container-low);
+    }
+
+    .nav-tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: var(--surface-container-low);
+    }
+
+    .nav-tab-btn i {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Main Content Area */
+    .main-viewport {
+      flex: 1;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: var(--space-lg);
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 150ms ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* UI Cards & Panels */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-lg);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--outline-variant);
+      background: var(--surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--on-surface);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .card-body {
+      padding: var(--space-lg);
+    }
+
+    /* Quick KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--outline-variant);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .kpi-card.green { border-left-color: var(--secondary); }
+    .kpi-card.amber { border-left-color: var(--warning); }
+    .kpi-card.red { border-left-color: var(--error); }
+    .kpi-card.cyan { border-left-color: var(--tertiary); }
+
+    .kpi-title {
+      font-size: 11px;
+      font-family: var(--font-label);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: var(--space-xs);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--on-surface);
+      line-height: 1.1;
+      font-family: var(--font-headline);
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--on-surface-variant);
+      margin-top: 6px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 14px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: var(--on-secondary);
+    }
+    .btn-secondary:hover {
+      background: var(--secondary-hover);
+    }
+
+    .btn-outline {
+      background: var(--surface);
+      border-color: var(--outline);
+      color: var(--on-surface);
+    }
+    .btn-outline:hover {
+      background: var(--surface-container);
+      border-color: var(--on-surface-variant);
+    }
+
+    .btn-danger {
+      background: var(--error);
+      color: var(--on-error);
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+
+    .btn-group {
+      display: inline-flex;
+      gap: var(--space-xs);
+      flex-wrap: wrap;
+    }
+
+    /* Filter Controls Row */
+    .filter-bar {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: var(--space-md);
+      background: var(--surface-container-low);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--outline-variant);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-family: var(--font-label);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--on-surface-variant);
+    }
+
+    .form-select, .form-input, .form-textarea {
+      padding: 7px 10px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--on-surface);
+      background: var(--surface);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      min-width: 140px;
+    }
+
+    .form-select:focus, .form-input:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+
+    /* Data Tables */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: var(--surface-container);
+      color: var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--outline-variant);
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--outline-variant);
+      color: var(--on-surface);
+      vertical-align: middle;
+    }
+
+    .data-table tr:hover {
+      background: #f8fafc;
+    }
+
+    .data-table tr.selected {
+      background: var(--primary-container);
+    }
+
+    /* Badges & Tags */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-family: var(--font-label);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+
+    .badge-primary { background: var(--primary-container); color: var(--on-primary-container); }
+    .badge-secondary { background: var(--secondary-container); color: var(--on-secondary-container); }
+    .badge-warning { background: var(--warning-container); color: var(--on-warning-container); }
+    .badge-danger { background: var(--error-container); color: var(--on-error-container); }
+    .badge-neutral { background: var(--surface-container-high); color: var(--on-surface-variant); }
+
+    /* Timetable Grid */
+    .timetable-wrapper {
+      overflow-x: auto;
+    }
+
+    .timetable-grid {
+      min-width: 900px;
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .timetable-grid th, .timetable-grid td {
+      border: 1px solid var(--outline-variant);
+      padding: 8px;
+      text-align: center;
+    }
+
+    .timetable-grid th {
+      background: var(--surface-container);
+      font-family: var(--font-label);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .time-slot-label {
+      width: 110px;
+      background: var(--surface-container-low);
+      font-family: var(--font-label);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--on-surface-variant);
+    }
+
+    .session-cell {
+      height: 72px;
+      vertical-align: top;
+      background: var(--surface);
+      position: relative;
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 4px;
+    }
+
+    .session-cell:hover {
+      background: var(--surface-container-low);
+    }
+
+    .session-card {
+      height: 100%;
+      border-radius: var(--radius-sm);
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: left;
+      font-size: 11px;
+      box-shadow: var(--shadow-sm);
+      border-left: 3px solid var(--primary);
+    }
+
+    .session-card.french-lecture { background: #eff6ff; border-left-color: #2563eb; color: #1e3a8a; }
+    .session-card.french-langue { background: #f0fdf4; border-left-color: #16a34a; color: #14532d; }
+    .session-card.french-ecrit { background: #fefce8; border-left-color: #ca8a04; color: #713f12; }
+    .session-card.french-oral { background: #faf5ff; border-left-color: #9333ea; color: #581c87; }
+    .session-card.french-soutien { background: #fff1f2; border-left-color: #e11d48; color: #881337; }
+
+    .session-title { font-weight: 700; font-size: 12px; }
+    .session-meta { display: flex; justify-content: space-between; font-size: 10px; opacity: 0.9; }
+
+    /* Modals */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-md);
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-window {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      max-width: 750px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--outline);
+      animation: modalPop 150ms ease-out;
+    }
+
+    .modal-window.modal-lg {
+      max-width: 1100px;
+    }
+
+    @keyframes modalPop {
+      from { transform: scale(0.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-head {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--outline-variant);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface-container-low);
+    }
+
+    .modal-head h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      padding: 4px;
+    }
+    .modal-close-btn:hover { color: var(--on-surface); }
+
+    .modal-body {
+      padding: var(--space-lg);
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: var(--space-md) var(--space-lg);
+      border-top: 1px solid var(--outline-variant);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-sm);
+      background: var(--surface-container-low);
+    }
+
+    /* Print Preview Styles */
+    .print-preview-container {
+      background: #525252;
+      padding: var(--space-lg);
+      display: flex;
+      justify-content: center;
+      overflow-y: auto;
+      max-height: 70vh;
+    }
+
+    .a4-sheet {
+      background: #ffffff;
+      width: 210mm;
+      min-height: 297mm;
+      padding: 12mm 15mm;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      color: #000000;
+      font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* Printable Massar Table */
+    .massar-doc-header {
+      border-bottom: 2px solid #000000;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      direction: rtl;
+      font-family: var(--font-arabic);
+    }
+
+    .massar-doc-title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-decoration: underline;
+    }
+
+    .massar-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      direction: rtl;
+    }
+
+    .massar-meta-item {
+      display: flex;
+      gap: 4px;
+    }
+
+    .massar-two-col-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      direction: rtl;
+      margin-top: 10px;
+    }
+
+    .massar-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      direction: rtl;
+    }
+
+    .massar-table th, .massar-table td {
+      border: 1px solid #333333;
+      padding: 4px 6px;
+      text-align: right;
+    }
+
+    .massar-table th {
+      background-color: #f1f5f9;
+      font-family: var(--font-arabic);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .massar-table td.center {
+      text-align: center;
+    }
+
+    .massar-signatures {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      direction: rtl;
+      font-family: var(--font-arabic);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 0 40px;
+    }
+
+    /* Individual Student Report Card */
+    .report-card-header {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .report-header-emblem {
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .report-student-box {
+      display: flex;
+      gap: 16px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+
+    .report-student-photo {
+      width: 60px;
+      height: 70px;
+      border: 1px solid #94a3b8;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #64748b;
+    }
+
+    /* Distribution Histogram (Grades) */
+    .histogram-bar-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .histogram-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 40px;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: 12px;
+    }
+
+    .histogram-track {
+      background: var(--surface-container-high);
+      height: 18px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .histogram-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 300ms ease;
+    }
+
+    .histogram-fill.green { background: var(--secondary); }
+    .histogram-fill.amber { background: var(--warning); }
+    .histogram-fill.red { background: var(--error); }
+
+    /* Interactive Attendance Toggle Buttons */
+    .status-toggle-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--outline);
+      background: var(--surface);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .status-toggle-btn.present.active { background: #dcfce7; color: #15803d; border-color: #22c55e; }
+    .status-toggle-btn.absent.active { background: #fee2e2; color: #b91c1c; border-color: #ef4444; }
+    .status-toggle-btn.justified.active { background: #e0f2fe; color: #0369a1; border-color: #0ea5e9; }
+    .status-toggle-btn.late.active { background: #fef3c7; color: #b45309; border-color: #f59e0b; }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: toastIn 200ms ease-out;
+      border-left: 4px solid var(--primary);
+    }
+
+    .toast.success { border-left-color: var(--secondary); }
+    .toast.error { border-left-color: var(--error); }
+
+    @keyframes toastIn {
+      from { transform: translateX(50px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Print Media Queries */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+
+      .gov-banner,
+      .app-header,
+      .nav-tabs-bar,
+      .no-print,
+      .filter-bar,
+      .btn,
+      .modal-backdrop:not(.print-modal),
+      .toast-container {
+        display: none !important;
+      }
+
+      .main-viewport {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .tab-pane {
+        display: none !important;
+      }
+
+      .tab-pane.print-active {
+        display: block !important;
+      }
+
+      .print-preview-container {
+        background: transparent !important;
+        padding: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+
+      .a4-sheet {
+        box-shadow: none !important;
+        width: 100% !important;
+        min-height: auto !important;
+        padding: 0 !important;
+        page-break-after: always;
+      }
+
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+    }
+
+    /* Responsive Mobile adjustments */
+    @media (max-width: 768px) {
+      .app-header { padding: var(--space-sm) var(--space-md); }
+      .brand-titles h1 { font-size: 16px; }
+      .teacher-badge-container { display: none; }
+      .main-viewport { padding: var(--space-md); }
+      .card-header { flex-direction: column; align-items: flex-start; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Institutional Ribbon -->
+  <div class="gov-banner no-print">
+    <div class="gov-banner-text">
+      <span class="gov-badge">
+        <i data-lucide="shield-check" style="width: 12px; height: 12px;"></i>
+        Royaume du Maroc — Ministère de l'Éducation Nationale
+      </span>
+      <span>AREF Souss-Massa — Direction Provinciale Taroudant</span>
+      <span class="font-arabic" style="margin-left: auto;">المملكة المغربية — وزارة التربية الوطنية والتعليم الأولي والرياضة</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span class="badge badge-secondary" style="font-size: 10px;">Année 2026/2027</span>
+      <span class="badge badge-neutral" style="font-size: 10px;">100% Hors-Ligne</span>
+    </div>
+  </div>
+
+  <!-- Main Header with Logo, School Identification & Teacher Profile -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand-section">
+        <!-- Crisp Vector SVG of Moroccan National Education Shield -->
+        <svg class="ministry-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Armoiries Officielles Maroc">
+          <circle cx="50" cy="50" r="46" fill="#1e3a8a" stroke="#d97706" stroke-width="3"/>
+          <circle cx="50" cy="50" r="40" fill="#ffffff"/>
+          <!-- Moroccan Green Star (Pentagram) -->
+          <polygon points="50,22 58,47 84,47 63,63 71,88 50,72 29,88 37,63 16,47 42,47" fill="#047857" stroke="#064e3b" stroke-width="1.5"/>
+          <!-- Crown on top -->
+          <path d="M42 22 L45 27 L50 21 L55 27 L58 22 L55 31 L45 31 Z" fill="#d97706"/>
+          <!-- Olive branches -->
+          <path d="M22 65 C24 75 35 83 50 83 C65 83 76 75 78 65" stroke="#d97706" stroke-width="3" fill="none"/>
+        </svg>
+
+        <div class="brand-titles">
+          <h1>
+            <span>Gestion & Suivi Scolaire</span>
+            <span class="badge badge-primary">Collège Aoulouz</span>
+          </h1>
+          <div class="school-name">
+            <span class="font-arabic">ثانوية اولوز الإعدادية</span>
+            <span>•</span>
+            <span>Enseignement Secondaire Collégial (1ACSC, 2ACSC, 3ACSC)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Teacher Identification Card (Prof. Kellouch Abdelghani) -->
+      <div class="teacher-badge-container">
+        <div class="teacher-avatar-frame" id="teacherAvatarFrame" title="Cliquer pour changer la photo du professeur" onclick="triggerTeacherPhotoUpload()">
+          <img id="teacherAvatarImg" class="teacher-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%231e3a8a'/%3E%3Ccircle cx='40' cy='32' r='18' fill='%23dbeafe'/%3E%3Cpath d='M15 75 C 15 55, 65 55, 65 75 Z' fill='%23dbeafe'/%3E%3C/svg%3E" alt="Prof. Kellouch">
+        </div>
+        <input type="file" id="teacherPhotoInput" accept="image/*" style="display: none;" onchange="handleTeacherPhotoUpload(event)">
+        
+        <div class="teacher-info">
+          <div class="teacher-name">Prof. Kellouch Abdelghani</div>
+          <div class="teacher-meta">
+            <span class="status-dot-pulse"></span>
+            <span>Professeur de Langue Française</span>
+            <span>•</span>
+            <span class="font-mono">1APIC / 2APIC / 3APIC</span>
+          </div>
+        </div>
+
+        <div style="margin-left: 8px; display: flex; gap: 4px;">
+          <button class="btn btn-outline btn-sm no-print" onclick="showQuickModal('backupModal')" title="Sauvegardes et imports">
+            <i data-lucide="database" style="width: 14px; height: 14px;"></i>
+          </button>
+          <button class="btn btn-primary btn-sm no-print" onclick="triggerQuickPrintMassar()" title="Imprimer Feuille Massar">
+            <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tab Bar -->
+  <nav class="nav-tabs-bar no-print">
+    <div class="nav-tabs-container">
+      <button class="nav-tab-btn active" onclick="switchTab('tabDashboard')">
+        <i data-lucide="layout-dashboard"></i> Tableau de bord
+      </button>
+      <button class="nav-tab-btn" onclick="switchTab('tabStudents')">
+        <i data-lucide="users"></i> Élèves & Classes
+      </button>
+      <button class="nav-tab-btn" onclick="switchTab('tabTimetable')">
+        <i data-lucide="calendar"></i> Emploi du Temps
+      </button>
+      <button class="nav-tab-btn" onclick="switchTab('tabAttendance')">
+        <i data-lucide="check-square"></i> Appel & Absences
+      </button>
+      <button class="nav-tab-btn" onclick="switchTab('tabDiscipline')">
+        <i data-lucide="alert-triangle"></i> Discipline & Conduite
+      </button>
+      <button class="nav-tab-btn" onclick="switchTab('tabGrades')">
+        <i data-lucide="award"></i> Évaluations & Notes
+      </button>
+      <button class="nav-tab-btn" onclick="switchTab('tabProjects')">
+        <i data-lucide="folder-kanban"></i> Projets Pédagogiques
+      </button>
+      <button class="nav-tab-btn" onclick="switchTab('tabPrint')">
+        <i data-lucide="printer"></i> Documents & Impressions
+      </button>
+      <button class="nav-tab-btn" onclick="switchTab('tabSettings')">
+        <i data-lucide="settings"></i> Sauvegarde & Réglages
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Viewport -->
+  <main class="main-viewport">
+
+    <!-- TAB 1: TABLEAU DE BORD (DASHBOARD) -->
+    <section id="tabDashboard" class="tab-pane active">
+      <!-- KPI Stats Row -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">
+            <span>Total Élèves Inscrits</span>
+            <i data-lucide="users" style="width: 14px; height: 14px; color: var(--primary);"></i>
+          </div>
+          <div class="kpi-value" id="dashTotalStudents">206</div>
+          <div class="kpi-sub">Répartis sur 6 classes (1ACSC, 2ACSC, 3ACSC)</div>
+        </div>
+
+        <div class="kpi-card green">
+          <div class="kpi-title">
+            <span>Taux d'Assiduité Global</span>
+            <i data-lucide="check-circle" style="width: 14px; height: 14px; color: var(--secondary);"></i>
+          </div>
+          <div class="kpi-value" id="dashAttendanceRate">96.4%</div>
+          <div class="kpi-sub">Séances enregistrées ce semestre</div>
+        </div>
+
+        <div class="kpi-card cyan">
+          <div class="kpi-title">
+            <span>Moyenne Générale Français</span>
+            <i data-lucide="trending-up" style="width: 14px; height: 14px; color: var(--tertiary);"></i>
+          </div>
+          <div class="kpi-value" id="dashAverageGrade">12.85 <span style="font-size: 14px; font-weight: 500;">/20</span></div>
+          <div class="kpi-sub">Sur les contrôles CC1 & CC2 saisis</div>
+        </div>
+
+        <div class="kpi-card amber">
+          <div class="kpi-title">
+            <span>Alertes Absentéisme (≥3)</span>
+            <i data-lucide="alert-circle" style="width: 14px; height: 14px; color: var(--warning);"></i>
+          </div>
+          <div class="kpi-value" id="dashAbsenceAlerts">4</div>
+          <div class="kpi-sub">Élèves nécessitant convocation tuteur</div>
+        </div>
+      </div>
+
+      <!-- 2 Columns: Classes Summary & Next Classes -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: var(--space-lg);">
+        
+        <!-- Classes Overview Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <i data-lucide="school" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Répartition des Classes — Prof. Kellouch
+            </h2>
+            <button class="btn btn-outline btn-sm" onclick="switchTab('tabStudents')">Voir les listes</button>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Niveau</th>
+                  <th>Classe</th>
+                  <th>Effectif</th>
+                  <th>Moyenne CC</th>
+                  <th>Assiduité</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashClassesTableBody">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Today's Schedule & Quick Attendance -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <i data-lucide="clock" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Séances du Jour (Aujourd'hui)
+            </h2>
+            <button class="btn btn-primary btn-sm" onclick="switchTab('tabTimetable')">Emploi complet</button>
+          </div>
+          <div class="card-body">
+            <div id="dashTodaySessionsList" style="display: flex; flex-direction: column; gap: var(--space-sm);">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Recent Incidents & Pedagogical Projects Summary -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: var(--space-lg); margin-top: var(--space-lg);">
+        
+        <!-- Absenteeism & Discipline Alerts -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <i data-lucide="shield-alert" style="width: 18px; height: 18px; color: var(--error);"></i>
+              Élèves signalés (Assiduité & Comportement)
+            </h2>
+            <button class="btn btn-outline btn-sm" onclick="switchTab('tabDiscipline')">Journal de bord</button>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Élève</th>
+                  <th>Classe</th>
+                  <th>Absences</th>
+                  <th>Statut / Mesure</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashAlertsTableBody">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Ongoing Class Projects -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <i data-lucide="folder" style="width: 18px; height: 18px; color: var(--secondary);"></i>
+              Projets Pédagogiques en cours
+            </h2>
+            <button class="btn btn-secondary btn-sm" onclick="switchTab('tabProjects')">+ Nouveau projet</button>
+          </div>
+          <div class="card-body" id="dashProjectsSummaryList">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: ÉLÈVES & CLASSES -->
+    <section id="tabStudents" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i data-lucide="users" style="width: 18px; height: 18px; color: var(--primary);"></i>
+            Gestion des Élèves et Effectifs de Classe
+          </h2>
+          <div class="btn-group">
+            <button class="btn btn-outline btn-sm" onclick="exportStudentsCSV()">
+              <i data-lucide="download" style="width: 14px; height: 14px;"></i> Export CSV
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="triggerImportCSV()">
+              <i data-lucide="upload" style="width: 14px; height: 14px;"></i> Import CSV
+            </button>
+            <input type="file" id="csvFileInput" accept=".csv" style="display: none;" onchange="handleCSVFileImport(event)">
+            <button class="btn btn-primary btn-sm" onclick="openStudentModal(null)">
+              <i data-lucide="user-plus" style="width: 14px; height: 14px;"></i> + Ajouter Élève
+            </button>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <!-- Filters Row -->
+          <div class="filter-bar">
+            <div class="form-group">
+              <label class="form-label" for="filterStudentLevel">Niveau Collégial</label>
+              <select id="filterStudentLevel" class="form-select" onchange="applyStudentFilters()">
+                <option value="ALL">Tous les niveaux (1ACSC, 2ACSC, 3ACSC)</option>
+                <option value="1ACSC">1ACSC (1ère Année Collège)</option>
+                <option value="2ACSC">2ACSC (2ème Année Collège)</option>
+                <option value="3ACSC">3ACSC (3ème Année Collège)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="filterStudentClass">Classe Spécifique</label>
+              <select id="filterStudentClass" class="form-select" onchange="applyStudentFilters()">
+                <option value="ALL">Toutes les classes</option>
+                <option value="1APIC-1">1APIC-1 (35 élèves)</option>
+                <option value="1APIC-2">1APIC-2 (37 élèves)</option>
+                <option value="2APIC-1">2APIC-1 (30 élèves)</option>
+                <option value="3APIC-1">3APIC-1 (34 élèves)</option>
+                <option value="3APIC-2">3APIC-2 (34 élèves)</option>
+                <option value="3APIC-3">3APIC-3 (36 élèves)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label" for="searchStudentInput">Recherche Rapide (Nom, Code Massar)</label>
+              <input type="text" id="searchStudentInput" class="form-input" placeholder="Ex: نايت لحسن, R183072983, Adam..." oninput="applyStudentFilters()">
+            </div>
+
+            <div style="align-self: flex-end;">
+              <span id="studentsFilterCount" class="badge badge-neutral" style="padding: 8px 12px; font-size: 12px;">
+                Affichage de 206 élèves
+              </span>
+            </div>
+          </div>
+
+          <!-- Students List Table -->
+          <div class="table-container">
+            <table class="data-table" id="studentsMainTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Code Massar</th>
+                  <th>Nom & Prénom (Arabe)</th>
+                  <th>Nom & Prénom (Français)</th>
+                  <th>Classe</th>
+                  <th>Genre</th>
+                  <th>Moyenne</th>
+                  <th>Absences</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="studentsTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: EMPLOI DU TEMPS -->
+    <section id="tabTimetable" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <i data-lucide="calendar" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Emploi du Temps Hebdomadaire — Prof. Kellouch Abdelghani
+            </h2>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+              Matière : Langue Française • Collège Aoulouz • Année 2026/2027
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-outline btn-sm" onclick="window.print()">
+              <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Imprimer Emploi
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="openTimetableEditorModal()">
+              <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Modifier / Ajouter Séance
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div style="display: flex; gap: var(--space-md); margin-bottom: var(--space-md); flex-wrap: wrap;">
+            <span class="badge" style="background: #eff6ff; color: #1e3a8a; border-left: 3px solid #2563eb;">Lecture / Compréhension</span>
+            <span class="badge" style="background: #f0fdf4; color: #14532d; border-left: 3px solid #16a34a;">Langue & Outils</span>
+            <span class="badge" style="background: #fefce8; color: #713f12; border-left: 3px solid #ca8a04;">Production Écrite</span>
+            <span class="badge" style="background: #faf5ff; color: #581c87; border-left: 3px solid #9333ea;">Activités Orales</span>
+            <span class="badge" style="background: #fff1f2; color: #881337; border-left: 3px solid #e11d48;">Évaluation & Soutien</span>
+          </div>
+
+          <div class="timetable-wrapper">
+            <table class="timetable-grid" id="weeklyTimetableGrid">
+              <thead>
+                <tr>
+                  <th class="time-slot-label">Horaire</th>
+                  <th>Lundi</th>
+                  <th>Mardi</th>
+                  <th>Mercredi</th>
+                  <th>Jeudi</th>
+                  <th>Vendredi</th>
+                  <th>Samedi</th>
+                </tr>
+              </thead>
+              <tbody id="timetableGridBody">
+                <!-- Dynamically rendered slots -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: APPEL & SUIVI DES ABSENCES -->
+    <section id="tabAttendance" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <i data-lucide="check-square" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Feuille d'Appel et Saisie des Absences / Retards
+            </h2>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+              Pointage rapide par séance • Alerte automatique d'absentéisme (≥3 absences)
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-secondary btn-sm" onclick="markAllPresent()">
+              <i data-lucide="check-check" style="width: 14px; height: 14px;"></i> Tous Présents (P)
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="saveCurrentAttendanceSession()">
+              <i data-lucide="save" style="width: 14px; height: 14px;"></i> Enregistrer la Séance
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Session Selector Bar -->
+          <div class="filter-bar">
+            <div class="form-group">
+              <label class="form-label" for="attendanceDateSelect">Date de la séance</label>
+              <input type="date" id="attendanceDateSelect" class="form-input" value="2026-11-06" onchange="loadAttendanceSession()">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="attendanceClassSelect">Classe</label>
+              <select id="attendanceClassSelect" class="form-select" onchange="loadAttendanceSession()">
+                <option value="1APIC-1">1APIC-1</option>
+                <option value="1APIC-2">1APIC-2</option>
+                <option value="2APIC-1">2APIC-1</option>
+                <option value="3APIC-1">3APIC-1</option>
+                <option value="3APIC-2">3APIC-2</option>
+                <option value="3APIC-3">3APIC-3</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="attendanceSlotSelect">Créneau Horaire</label>
+              <select id="attendanceSlotSelect" class="form-select" onchange="loadAttendanceSession()">
+                <option value="08:30 - 09:30">08:30 - 09:30 (Matin)</option>
+                <option value="09:30 - 10:30">09:30 - 10:30 (Matin)</option>
+                <option value="10:30 - 11:30">10:30 - 11:30 (Matin)</option>
+                <option value="11:30 - 12:30">11:30 - 12:30 (Matin)</option>
+                <option value="14:30 - 15:30">14:30 - 15:30 (Après-midi)</option>
+                <option value="15:30 - 16:30">15:30 - 16:30 (Après-midi)</option>
+                <option value="16:30 - 17:30">16:30 - 17:30 (Après-midi)</option>
+                <option value="17:30 - 18:30">17:30 - 18:30 (Après-midi)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="attendanceActivityType">Type d'Activité</label>
+              <select id="attendanceActivityType" class="form-select">
+                <option value="Lecture">Lecture méthodique</option>
+                <option value="Langue">Langue & Outils</option>
+                <option value="Ecrit">Production écrite</option>
+                <option value="Oral">Activités orales</option>
+                <option value="Soutien">Soutien / Évaluation</option>
+              </select>
+            </div>
+
+            <div style="margin-left: auto; display: flex; gap: var(--space-md); align-items: center;">
+              <div style="font-size: 12px; text-align: right;">
+                <div>Présents : <strong id="sessionCountPresent" style="color: var(--secondary);">0</strong></div>
+                <div>Absents : <strong id="sessionCountAbsent" style="color: var(--error);">0</strong> • Retards : <strong id="sessionCountLate" style="color: var(--warning);">0</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Attendance Entry Table -->
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 40px;">#</th>
+                  <th>Code Massar</th>
+                  <th>Nom de l'élève (Arabe)</th>
+                  <th>Nom (Français)</th>
+                  <th style="width: 170px; text-align: center;">Statut Présence</th>
+                  <th style="width: 110px;">Retard (min)</th>
+                  <th>Motif / Justification</th>
+                  <th style="width: 120px;">Cumul Absences</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceTableBody">
+                <!-- Dynamically generated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: DISCIPLINE & COMPORTEMENT -->
+    <section id="tabDiscipline" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <i data-lucide="alert-triangle" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Discipline, Conduite & Climat de Classe
+            </h2>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+              Suivi des incidents, sanctions positives/négatives, convocations tuteurs
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openDisciplineModal()">
+            <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i> Enregistrer un Incident / Bonus
+          </button>
+        </div>
+
+        <div class="card-body">
+          <!-- Filters -->
+          <div class="filter-bar">
+            <div class="form-group">
+              <label class="form-label" for="filterDisciplineClass">Filtrer par Classe</label>
+              <select id="filterDisciplineClass" class="form-select" onchange="renderDisciplineTable()">
+                <option value="ALL">Toutes les classes</option>
+                <option value="1APIC-1">1APIC-1</option>
+                <option value="1APIC-2">1APIC-2</option>
+                <option value="2APIC-1">2APIC-1</option>
+                <option value="3APIC-1">3APIC-1</option>
+                <option value="3APIC-2">3APIC-2</option>
+                <option value="3APIC-3">3APIC-3</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="filterDisciplineType">Type d'Événement</label>
+              <select id="filterDisciplineType" class="form-select" onchange="renderDisciplineTable()">
+                <option value="ALL">Tous les types</option>
+                <option value="BONUS">Bonus / Félicitations (+)</option>
+                <option value="WARNING">Avertissement oral / écrit</option>
+                <option value="CHATTER">Bavardage / Agitation</option>
+                <option value="MATERIAL">Oubli d'affaires / Manuel</option>
+                <option value="DETENTION">Retenue / Travail supplémentaire</option>
+                <option value="SUMMONS">Convocation Parent / Tuteur</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Incidents History Table -->
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Élève</th>
+                  <th>Classe</th>
+                  <th>Type & Catégorie</th>
+                  <th>Impact Points</th>
+                  <th>Description / Faits</th>
+                  <th>Mesure Prise</th>
+                  <th>Statut</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="disciplineTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: ÉVALUATIONS & NOTES DES ÉPREUVES (MASSAR) -->
+    <section id="tabGrades" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <i data-lucide="award" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Saisie des Notes & Évaluations des Épreuves (Système Massar)
+            </h2>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+              Contrôles Continus (CC1, CC2, CC3), Activités Intégrées (AI), calcul automatique de moyenne
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-outline btn-sm" onclick="exportMassarGradesCSV()">
+              <i data-lucide="file-spreadsheet" style="width: 14px; height: 14px;"></i> Export Massar (Excel/CSV)
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="previewMassarGradeSheet()">
+              <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Imprimer Feuille Officielle (A4)
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Class & Exam Selector -->
+          <div class="filter-bar">
+            <div class="form-group">
+              <label class="form-label" for="gradesClassSelect">Sélectionner la classe</label>
+              <select id="gradesClassSelect" class="form-select" onchange="renderGradesTable()">
+                <option value="1APIC-1">1APIC-1 (1ère Année)</option>
+                <option value="1APIC-2">1APIC-2 (1ère Année)</option>
+                <option value="2APIC-1">2APIC-1 (2ème Année)</option>
+                <option value="3APIC-1">3APIC-1 (3ème Année)</option>
+                <option value="3APIC-2">3APIC-2 (3ème Année)</option>
+                <option value="3APIC-3">3APIC-3 (3ème Année)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="gradesPeriodSelect">Semestre / Période</label>
+              <select id="gradesPeriodSelect" class="form-select" onchange="renderGradesTable()">
+                <option value="S1">Semestre 1 (الدورة الأولى)</option>
+                <option value="S2">Semestre 2 (الدورة الثانية)</option>
+              </select>
+            </div>
+
+            <div style="margin-left: auto; display: flex; gap: var(--space-md); align-items: center;">
+              <span class="badge badge-primary" style="padding: 6px 12px; font-size: 12px;">
+                Langue Française • Collège Aoulouz
+              </span>
+            </div>
+          </div>
+
+          <!-- Class Performance Stats Cards -->
+          <div class="kpi-grid" style="margin-bottom: var(--space-md);">
+            <div class="kpi-card" style="padding: 10px;">
+              <div class="kpi-title">Moyenne de Classe</div>
+              <div class="kpi-value" id="statsClassAvg" style="font-size: 20px;">12.45 /20</div>
+            </div>
+            <div class="kpi-card green" style="padding: 10px;">
+              <div class="kpi-title">Note Maximale</div>
+              <div class="kpi-value" id="statsClassMax" style="font-size: 20px;">18.50 /20</div>
+            </div>
+            <div class="kpi-card red" style="padding: 10px;">
+              <div class="kpi-title">Note Minimale</div>
+              <div class="kpi-value" id="statsClassMin" style="font-size: 20px;">06.00 /20</div>
+            </div>
+            <div class="kpi-card cyan" style="padding: 10px;">
+              <div class="kpi-title">Taux de Réussite (≥ 10/20)</div>
+              <div class="kpi-value" id="statsPassRate" style="font-size: 20px;">82.5%</div>
+            </div>
+          </div>
+
+          <!-- Grade Distribution Visual Bar -->
+          <div class="card" style="margin-bottom: var(--space-md); padding: 12px; background: var(--surface-container-low);">
+            <div style="font-size: 12px; font-family: var(--font-label); font-weight: 600; margin-bottom: 8px;">
+              RÉPARTITION STATISTIQUE DES MOYENNES (HISTOGRAMME)
+            </div>
+            <div class="histogram-bar-group" id="gradeDistributionGroup">
+              <!-- Dynamically rendered -->
+            </div>
+          </div>
+
+          <!-- Spreadsheet Grade Entry Table -->
+          <div class="table-container">
+            <table class="data-table" id="gradesTable">
+              <thead>
+                <tr>
+                  <th style="width: 36px;">#</th>
+                  <th>Code Massar</th>
+                  <th>Nom & Prénom (Arabe)</th>
+                  <th>Nom (Français)</th>
+                  <th style="width: 100px; text-align: center;">CC 1 (/20)</th>
+                  <th style="width: 100px; text-align: center;">CC 2 (/20)</th>
+                  <th style="width: 100px; text-align: center;">CC 3 (/20)</th>
+                  <th style="width: 110px; text-align: center;">Act. Intég. (/20)</th>
+                  <th style="width: 100px; text-align: center;">Moyenne</th>
+                  <th>Appréciation Pédagogique</th>
+                  <th style="width: 70px;">Bulletin</th>
+                </tr>
+              </thead>
+              <tbody id="gradesTableBody">
+                <!-- Dynamically populated rows with live inputs -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 7: SUIVI DES PROJETS ÉLÈVES -->
+    <section id="tabProjects" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <i data-lucide="folder-kanban" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Projets Pédagogiques & Travaux de Classe
+            </h2>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+              Suivi des productions d'élèves (Journal de classe, Théâtre, Dossiers de lecture, Exposés régionaux)
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openProjectModal(null)">
+            <i data-lucide="plus" style="width: 14px; height: 14px;"></i> + Créer un Projet
+          </button>
+        </div>
+
+        <div class="card-body">
+          <div class="filter-bar">
+            <div class="form-group">
+              <label class="form-label" for="filterProjectClass">Classe</label>
+              <select id="filterProjectClass" class="form-select" onchange="renderProjectsGrid()">
+                <option value="ALL">Toutes les classes</option>
+                <option value="1APIC-1">1APIC-1</option>
+                <option value="1APIC-2">1APIC-2</option>
+                <option value="2APIC-1">2APIC-1</option>
+                <option value="3APIC-1">3APIC-1</option>
+                <option value="3APIC-2">3APIC-2</option>
+                <option value="3APIC-3">3APIC-3</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="filterProjectStatus">Statut du Projet</label>
+              <select id="filterProjectStatus" class="form-select" onchange="renderProjectsGrid()">
+                <option value="ALL">Tous les statuts</option>
+                <option value="IN_PROGRESS">En cours d'élaboration</option>
+                <option value="TO_REVISE">À réviser / Améliorer</option>
+                <option value="VALIDATED">Validé / Noté</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Projects Grid -->
+          <div id="projectsCardsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--space-md);">
+            <!-- Dynamically populated cards -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 8: DOCUMENTS & IMPRESSIONS OFFICIELLES (A4) -->
+    <section id="tabPrint" class="tab-pane">
+      <div class="card">
+        <div class="card-header no-print">
+          <div>
+            <h2 class="card-title">
+              <i data-lucide="printer" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Édition et Impression de Documents Officiels Format A4
+            </h2>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+              Feuilles de saisie Massar officielles conformes au Ministère • Relevés de notes individuels
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-outline btn-sm" onclick="switchPrintDocType('massar')">
+              <i data-lucide="file-text" style="width: 14px; height: 14px;"></i> Feuille Massar PDF Conforme
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="switchPrintDocType('bulletin')">
+              <i data-lucide="user-check" style="width: 14px; height: 14px;"></i> Relevé Individuel
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="window.print()">
+              <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Imprimer la Page A4
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body" style="padding: 0;">
+          <!-- Controls for document customization -->
+          <div class="filter-bar no-print" style="margin: var(--space-md); margin-bottom: 0;">
+            <div class="form-group">
+              <label class="form-label" for="printClassSelect">Classe pour l'impression</label>
+              <select id="printClassSelect" class="form-select" onchange="updatePrintDocumentView()">
+                <option value="1APIC-1">1APIC-1 (1ère Année collégiale)</option>
+                <option value="1APIC-2">1APIC-2 (1ère Année collégiale)</option>
+                <option value="2APIC-1">2APIC-1 (2ème Année collégiale)</option>
+                <option value="3APIC-1">3APIC-1 (3ème Année collégiale)</option>
+                <option value="3APIC-2">3APIC-2 (3ème Année collégiale)</option>
+                <option value="3APIC-3">3APIC-3 (3ème Année collégiale)</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="printExamSelectContainer">
+              <label class="form-label" for="printExamSelect">Épreuve Massar</label>
+              <select id="printExamSelect" class="form-select" onchange="updatePrintDocumentView()">
+                <option value="1">الفرض الأول (Contrôle 1)</option>
+                <option value="2">الفرض الثاني (Contrôle 2)</option>
+                <option value="3">الفرض الثالث (Contrôle 3)</option>
+                <option value="AI">الأنشطة المندمجة (Activités Intégrées)</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="printStudentSelectContainer" style="display: none;">
+              <label class="form-label" for="printStudentSelect">Sélectionner l'Élève</label>
+              <select id="printStudentSelect" class="form-select" onchange="updatePrintDocumentView()">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Print Preview Canvas / Sheet -->
+          <div class="print-preview-container">
+            <div class="a4-sheet" id="a4PrintSheet">
+              <!-- Content rendered dynamically: Massar sheet or Student Report Card -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 9: SAUVEGARDE & PARAMÈTRES -->
+    <section id="tabSettings" class="tab-pane">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: var(--space-lg);">
+        
+        <!-- Backup & Restoration Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <i data-lucide="database" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Sauvegarde et Restauration Complète
+            </h2>
+          </div>
+          <div class="card-body">
+            <p style="font-size: 13px; color: var(--on-surface-variant); margin-bottom: var(--space-md);">
+              L'application fonctionne à 100% hors-ligne. Toutes vos données sont enregistrées en local. Vous pouvez à tout moment exporter une copie de sécurité au format JSON ou restaurer un fichier précédent.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+              <div style="border: 1px solid var(--outline-variant); padding: var(--space-md); border-radius: var(--radius-sm);">
+                <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 4px;">Exporter les données</h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+                  Génère un fichier JSON sécurisé contenant tous les élèves, notes, présences, projets et incidents.
+                </p>
+                <button class="btn btn-primary" onclick="exportDatabaseJSON()">
+                  <i data-lucide="download" style="width: 16px; height: 16px;"></i> Télécharger la Sauvegarde (.JSON)
+                </button>
+              </div>
+
+              <div style="border: 1px solid var(--outline-variant); padding: var(--space-md); border-radius: var(--radius-sm);">
+                <h4 style="font-size: 14px; font-weight: 700; color: var(--secondary); margin-bottom: 4px;">Importer une sauvegarde</h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+                  Restaurez vos données à partir d'un fichier JSON exporté précédemment.
+                </p>
+                <button class="btn btn-secondary" onclick="triggerImportJSON()">
+                  <i data-lucide="upload" style="width: 16px; height: 16px;"></i> Restaurer un Fichier JSON
+                </button>
+                <input type="file" id="jsonFileInput" accept=".json" style="display: none;" onchange="handleJSONFileImport(event)">
+              </div>
+
+              <div style="border: 1px solid var(--error-container); background: #fff5f5; padding: var(--space-md); border-radius: var(--radius-sm);">
+                <h4 style="font-size: 14px; font-weight: 700; color: var(--error); margin-bottom: 4px;">Mode Démo & Réinitialisation</h4>
+                <p style="font-size: 12px; color: #7f1d1d; margin-bottom: 10px;">
+                  Réinitialise l'application avec les données réelles et authentiques du Collège Aoulouz (classes 1APIC, 2APIC, 3APIC).
+                </p>
+                <button class="btn btn-danger" onclick="resetToOfficialDemoData()">
+                  <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i> Recharger les Données Officielles Collège Aoulouz
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teacher Information & Evaluation Coefficients -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <i data-lucide="sliders" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              Paramètres Institutionnels & Coefficients
+            </h2>
+          </div>
+          <div class="card-body">
+            <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+              <div class="form-group">
+                <label class="form-label" for="settingTeacherName">Nom & Titre de l'Enseignant</label>
+                <input type="text" id="settingTeacherName" class="form-input" value="Prof. Kellouch Abdelghani">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingSubject">Matière Enseignée</label>
+                <input type="text" id="settingSubject" class="form-input" value="Langue Française">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingSchool">Établissement Scolaire</label>
+                <input type="text" id="settingSchool" class="form-input" value="Lycée Collégial Aoulouz (ثانوية اولوز الإعدادية)">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingDirection">Direction Provinciale / AREF</label>
+                <input type="text" id="settingDirection" class="form-input" value="Direction Provinciale de Taroudant — AREF Souss-Massa">
+              </div>
+
+              <div style="border-top: 1px solid var(--outline-variant); padding-top: var(--space-md); margin-top: var(--space-xs);">
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--on-surface); margin-bottom: 8px;">Pondération des Contrôles Continus (Coefficients)</h4>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-sm);">
+                  <div class="form-group">
+                    <label class="form-label" for="coefCC1">CC 1</label>
+                    <input type="number" id="coefCC1" class="form-input" value="1" min="1" max="5">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="coefCC2">CC 2</label>
+                    <input type="number" id="coefCC2" class="form-input" value="1" min="1" max="5">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="coefCC3">CC 3</label>
+                    <input type="number" id="coefCC3" class="form-input" value="1" min="1" max="5">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="coefAI">Act. Intég.</label>
+                    <input type="number" id="coefAI" class="form-input" value="1" min="1" max="5">
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" style="margin-top: 12px; align-self: flex-start;" onclick="saveSystemSettings()">
+                <i data-lucide="check" style="width: 16px; height: 16px;"></i> Enregistrer les Paramètres
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: FICHE ÉLÈVE (AJOUT / MODIFICATION) -->
+  <div class="modal-backdrop" id="studentModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-head">
+        <h3 id="studentModalTitle">
+          <i data-lucide="user"></i> Fiche Complète de l'Élève
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('studentModalBackdrop')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editStudentId">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+          <div class="form-group">
+            <label class="form-label" for="modalStudentMassar">Code Massar (CNE) *</label>
+            <input type="text" id="modalStudentMassar" class="form-input font-mono" placeholder="Ex: R183072983" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modalStudentClass">Classe & Niveau *</label>
+            <select id="modalStudentClass" class="form-select">
+              <option value="1APIC-1">1APIC-1 (1ère Année)</option>
+              <option value="1APIC-2">1APIC-2 (1ère Année)</option>
+              <option value="2APIC-1">2APIC-1 (2ème Année)</option>
+              <option value="3APIC-1">3APIC-1 (3ème Année)</option>
+              <option value="3APIC-2">3APIC-2 (3ème Année)</option>
+              <option value="3APIC-3">3APIC-3 (3ème Année)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modalStudentNameAr">Nom & Prénom en Arabe *</label>
+            <input type="text" id="modalStudentNameAr" class="form-input font-arabic" placeholder="مثال: نايت لحسن يوسف" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modalStudentNameFr">Nom & Prénom en Français</label>
+            <input type="text" id="modalStudentNameFr" class="form-input" placeholder="Ex: NAIT LAHCEN Youssef">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modalStudentGender">Genre</label>
+            <select id="modalStudentGender" class="form-select">
+              <option value="M">Masculin (Garçon)</option>
+              <option value="F">Féminin (Fille)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modalStudentBirth">Date de Naissance</label>
+            <input type="date" id="modalStudentBirth" class="form-input" value="2012-05-14">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modalStudentPhone">Téléphone Parent / Tuteur</label>
+            <input type="text" id="modalStudentPhone" class="form-input font-mono" placeholder="06XXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modalStudentStatus">Besoins Particuliers / PAI</label>
+            <input type="text" id="modalStudentStatus" class="form-input" placeholder="R.A.S / Lunettes...">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top: var(--space-md);">
+          <label class="form-label" for="modalStudentRemarks">Observations & Remarques Pédagogiques</label>
+          <textarea id="modalStudentRemarks" class="form-textarea" rows="3" placeholder="Comportement, points forts, difficultés en lecture/production écrite..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('studentModalBackdrop')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveStudentFromModal()">Enregistrer l'Élève</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AJOUT INCIDENT DISCIPLINAIRE -->
+  <div class="modal-backdrop" id="disciplineModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-head">
+        <h3>
+          <i data-lucide="alert-circle"></i> Saisie d'un Incident / Bonus Comportemental
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('disciplineModalBackdrop')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+          <div class="form-group">
+            <label class="form-label" for="discDateInput">Date du fait</label>
+            <input type="date" id="discDateInput" class="form-input" value="2026-11-06">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="discClassSelect">Classe</label>
+            <select id="discClassSelect" class="form-select" onchange="populateDisciplineStudentsDropdown()">
+              <option value="1APIC-1">1APIC-1</option>
+              <option value="1APIC-2">1APIC-2</option>
+              <option value="2APIC-1">2APIC-1</option>
+              <option value="3APIC-1">3APIC-1</option>
+              <option value="3APIC-2">3APIC-2</option>
+              <option value="3APIC-3">3APIC-3</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label" for="discStudentSelect">Élève concerné</label>
+            <select id="discStudentSelect" class="form-select">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="discCategorySelect">Type d'événement</label>
+            <select id="discCategorySelect" class="form-select" onchange="updateDisciplinePointsHint()">
+              <option value="PARTICIPATION_BONUS">Excellente Participation (+2 pts)</option>
+              <option value="HELP_BONUS">Entraide & Travail d'équipe (+1 pt)</option>
+              <option value="CHATTER">Bavardage persistant (-1 pt)</option>
+              <option value="NO_MATERIAL">Oubli manuel / cahier d'activités (-1 pt)</option>
+              <option value="HOMEWORK_MISSING">Devoir non rendu (-2 pts)</option>
+              <option value="INSOLENCE">Manque de respect / perturbation (-3 pts)</option>
+              <option value="LATE">Retard injustifié répété (-1 pt)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="discMeasureSelect">Mesure / Décision prise</label>
+            <select id="discMeasureSelect" class="form-select">
+              <option value="Félicitations">Félicitations orales</option>
+              <option value="Rappel à l'ordre">Rappel à l'ordre / Avertissement oral</option>
+              <option value="Avertissement écrit">Avertissement écrit au carnet</option>
+              <option value="Retenue">Retenue (1 heure le mercredi)</option>
+              <option value="Travail supplémentaire">Travail pédagogique supplémentaire</option>
+              <option value="Convocation tuteur">Convocation du tuteur / parent</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top: var(--space-md);">
+          <label class="form-label" for="discDescriptionInput">Détails des circonstances</label>
+          <textarea id="discDescriptionInput" class="form-textarea" rows="3" placeholder="Circonstances exactes de l'incident ou de la prestation remarquable..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('disciplineModalBackdrop')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveDisciplineEvent()">Enregistrer l'Événement</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PROJET PÉDAGOGIQUE -->
+  <div class="modal-backdrop" id="projectModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-head">
+        <h3 id="projectModalTitle">
+          <i data-lucide="folder-plus"></i> Projet Pédagogique
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('projectModalBackdrop')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editProjectId">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label" for="projectTitleInput">Intitulé du Projet *</label>
+            <input type="text" id="projectTitleInput" class="form-input" placeholder="Ex: Journal de classe : La Voix d'Aoulouz" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="projectClassSelect">Classe concernée</label>
+            <select id="projectClassSelect" class="form-select">
+              <option value="1APIC-1">1APIC-1</option>
+              <option value="1APIC-2">1APIC-2</option>
+              <option value="2APIC-1">2APIC-1</option>
+              <option value="3APIC-1">3APIC-1</option>
+              <option value="3APIC-2">3APIC-2</option>
+              <option value="3APIC-3">3APIC-3</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="projectStatusSelect">Statut d'avancement</label>
+            <select id="projectStatusSelect" class="form-select">
+              <option value="IN_PROGRESS">En cours de rédaction</option>
+              <option value="TO_REVISE">À réviser</option>
+              <option value="VALIDATED">Validé & Noté</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="projectDeadlineInput">Date d'échéance</label>
+            <input type="date" id="projectDeadlineInput" class="form-input" value="2026-12-15">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="projectGradeInput">Note attribuée (/20)</label>
+            <input type="number" id="projectGradeInput" class="form-input" min="0" max="20" step="0.25" placeholder="Ex: 16.5">
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label" for="projectMembersInput">Élèves / Groupe de travail</label>
+            <input type="text" id="projectMembersInput" class="form-input" placeholder="Ex: Youssef Nait Lahcen, Adam Aznak, Hanane Ghiwane...">
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label" for="projectDescInput">Objectifs & Critères d'Évaluation</label>
+            <textarea id="projectDescInput" class="form-textarea" rows="3" placeholder="Recherche documentaire, qualité de la langue, mise en page, soutenance orale..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('projectModalBackdrop')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveProjectFromModal()">Enregistrer le Projet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GESTION RAPIDE SAUVEGARDES -->
+  <div class="modal-backdrop" id="backupModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-head">
+        <h3>
+          <i data-lucide="database"></i> Données & Sauvegarde Locale
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('backupModalBackdrop')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="font-size: 13px; line-height: 1.6; color: var(--on-surface);">
+          <p>Toutes les données du Collège Aoulouz sont stockées de façon sécurisée et autonome sur votre appareil (fonctionnement 100% hors-ligne garanti).</p>
+          <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn btn-primary" onclick="exportDatabaseJSON(); closeModal('backupModalBackdrop');">
+              <i data-lucide="download"></i> Télécharger la sauvegarde JSON complète
+            </button>
+            <button class="btn btn-secondary" onclick="triggerImportJSON(); closeModal('backupModalBackdrop');">
+              <i data-lucide="upload"></i> Restaurer une sauvegarde JSON existante
+            </button>
+            <button class="btn btn-danger" onclick="resetToOfficialDemoData(); closeModal('backupModalBackdrop');">
+              <i data-lucide="refresh-cw"></i> Réinitialiser avec les données authentiques d'Aoulouz
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('backupModalBackdrop')">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ÉDITION SÉANCE EMPLOI DU TEMPS -->
+  <div class="modal-backdrop" id="timetableEditModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-head">
+        <h3><i data-lucide="calendar"></i> Modifier / Ajouter une Séance</h3>
+        <button class="modal-close-btn" onclick="closeModal('timetableEditModalBackdrop')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+          <div class="form-group">
+            <label class="form-label" for="editTtDay">Jour de la semaine</label>
+            <select id="editTtDay" class="form-select">
+              <option value="Lundi">Lundi</option>
+              <option value="Mardi">Mardi</option>
+              <option value="Mercredi">Mercredi</option>
+              <option value="Jeudi">Jeudi</option>
+              <option value="Vendredi">Vendredi</option>
+              <option value="Samedi">Samedi</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editTtTime">Plage horaire</label>
+            <select id="editTtTime" class="form-select">
+              <option value="08:30 - 09:30">08:30 - 09:30</option>
+              <option value="09:30 - 10:30">09:30 - 10:30</option>
+              <option value="10:30 - 11:30">10:30 - 11:30</option>
+              <option value="11:30 - 12:30">11:30 - 12:30</option>
+              <option value="14:30 - 15:30">14:30 - 15:30</option>
+              <option value="15:30 - 16:30">15:30 - 16:30</option>
+              <option value="16:30 - 17:30">16:30 - 17:30</option>
+              <option value="17:30 - 18:30">17:30 - 18:30</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editTtClass">Classe</label>
+            <select id="editTtClass" class="form-select">
+              <option value="1APIC-1">1APIC-1</option>
+              <option value="1APIC-2">1APIC-2</option>
+              <option value="2APIC-1">2APIC-1</option>
+              <option value="3APIC-1">3APIC-1</option>
+              <option value="3APIC-2">3APIC-2</option>
+              <option value="3APIC-3">3APIC-3</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editTtActivity">Activité Pédagogique</label>
+            <select id="editTtActivity" class="form-select">
+              <option value="Lecture">Lecture méthodique</option>
+              <option value="Langue">Langue & Outils</option>
+              <option value="Ecrit">Production écrite</option>
+              <option value="Oral">Activités orales</option>
+              <option value="Soutien">Soutien & Évaluation</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label" for="editTtRoom">Salle de cours</label>
+            <input type="text" id="editTtRoom" class="form-input" value="Salle 04" placeholder="Ex: Salle 04, Salle Multimédia...">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('timetableEditModalBackdrop')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveTimetableSession()">Enregistrer la Séance</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Host API Shim Injection Point for State Persistence -->
+  <api-shim></api-shim>
+
+  <!-- Application Logic -->
+  <script>
+    // --- Application State Schema ---
+    let appData = {
+      teacher: {
+        name: `Prof. Kellouch Abdelghani`,
+        subject: `Langue Française`,
+        school: `Lycée Collégial Aoulouz (ثانوية اولوز الإعدادية)`,
+        direction: `Direction Provinciale de Taroudant — AREF Souss-Massa`,
+        avatarBase64: null
+      },
+      settings: {
+        coefCC1: 1,
+        coefCC2: 1,
+        coefCC3: 1,
+        coefAI: 1
+      },
+      students: [],
+      timetable: [],
+      attendance: [],
+      discipline: [],
+      grades: {}, // studentId -> { CC1, CC2, CC3, AI, remark }
+      projects: []
+    };
+
+    let activeTabId = 'tabDashboard';
+    let currentPrintDocType = 'massar'; // 'massar' or 'bulletin'
+
+    // --- Official Demo Data Initializer ---
+    function getOfficialAoulouzDemoData() {
+      // 1APIC-1 real roster from PDF 1 & 6
+      const roster1APIC1 = [
+        { cne: `R183072983`, ar: `نايت لحسن يوسف`, fr: `NAIT LAHCEN Youssef`, gender: `M` },
+        { cne: `R186061886`, ar: `أزناك آدم`, fr: `AZNAK Adam`, gender: `M` },
+        { cne: `R190022664`, ar: `غيوان حنان`, fr: `GHIWANE Hanane`, gender: `F` },
+        { cne: `R193064951`, ar: `ايت الحاج مبارك شيماء`, fr: `AIT EL HAJ MBAREK Chaimae`, gender: `F` },
+        { cne: `R198071760`, ar: `ادالرامي حسناء`, fr: `ADALRAMI Hasna`, gender: `F` },
+        { cne: `R200006550`, ar: `كوناين عبد العالي`, fr: `KOUNAYN Abdelali`, gender: `M` },
+        { cne: `R200014037`, ar: `مكراز عبد الباسط`, fr: `MAKRAZ Abdelbasset`, gender: `M` },
+        { cne: `R201039783`, ar: `ضميري رضوان`, fr: `SMIRI Redouane`, gender: `M` },
+        { cne: `R202039746`, ar: `ايت الحاج محمد رميسة`, fr: `AIT EL HAJ MOHAMED Roumaissa`, gender: `F` },
+        { cne: `R202048064`, ar: `سامو هاجر`, fr: `SAMOU Hajar`, gender: `F` },
+        { cne: `R203012420`, ar: `ايت علي خالد`, fr: `AIT ALI Khalid`, gender: `M` },
+        { cne: `R204017224`, ar: `شماض فاطمة`, fr: `CHAMMAD Fatima`, gender: `F` },
+        { cne: `R206012954`, ar: `مسعيد سيف الدين`, fr: `MASSAID Saif Eddine`, gender: `M` },
+        { cne: `R206013961`, ar: `ايد القائد رميساء`, fr: `ID EL QAID Roumaissae`, gender: `F` },
+        { cne: `R206027580`, ar: `ازاز عبد الصمد`, fr: `AZAZ Abdessamad`, gender: `M` },
+        { cne: `R208039769`, ar: `بوكريش نصر الدين`, fr: `BOUKRICH Nasreddine`, gender: `M` },
+        { cne: `R208039772`, ar: `نفيل دعاء`, fr: `NOUFAIL Douae`, gender: `F` },
+        { cne: `H209014482`, ar: `عبيد هبة`, fr: `OUBAID Hiba`, gender: `F` },
+        { cne: `R184050028`, ar: `انقاش يحيى`, fr: `ANGACH Yahya`, gender: `M` },
+        { cne: `R190005927`, ar: `ايت العباس نعيمة`, fr: `AIT EL ABBAS Naima`, gender: `F` },
+        { cne: `R190027580`, ar: `كاوي هاجر`, fr: `KAOUI Hajar`, gender: `F` },
+        { cne: `R198010585`, ar: `ندحسين محمد`, fr: `NEDHOUCEIN Mohamed`, gender: `M` },
+        { cne: `R199010595`, ar: `اتروشت حسناء`, fr: `ATROUCHT Hasna`, gender: `F` },
+        { cne: `R200013974`, ar: `اهداو كوثر`, fr: `AHDAO Kawtar`, gender: `F` },
+        { cne: `R201016208`, ar: `ايتهمو رشيدة`, fr: `AITHAMMOU Rachida`, gender: `F` },
+        { cne: `R201058025`, ar: `ايت ماكوف محمد`, fr: `AIT MAKOUF Mohamed`, gender: `M` },
+        { cne: `R202039758`, ar: `مزوز عبد الصمد`, fr: `MAZOUZ Abdessamad`, gender: `M` },
+        { cne: `R202055357`, ar: `ايت عبد الله عبد العلي`, fr: `AIT ABDELLAH Abdelali`, gender: `M` },
+        { cne: `R204012960`, ar: `ميزا دنيا`, fr: `MIZA Dounia`, gender: `F` },
+        { cne: `R205014002`, ar: `تيسوت فاطمة`, fr: `TISSOUT Fatima`, gender: `F` },
+        { cne: `R206013958`, ar: `ازلاكا أنور`, fr: `AZLAKA Anouar`, gender: `M` },
+        { cne: `R206014069`, ar: `ازلماض عمران`, fr: `AZELMAD Imran`, gender: `M` },
+        { cne: `R208014032`, ar: `الوعضي حفصة`, fr: `EL OUADI Hafsa`, gender: `F` },
+        { cne: `R208039770`, ar: `مار محمد رضا`, fr: `MAR Mohamed Reda`, gender: `M` },
+        { cne: `R209012112`, ar: `ابلا سفيان`, fr: `IBLA Soufiane`, gender: `M` }
+      ];
+
+      // 1APIC-2 real roster from PDF 2 & 7
+      const roster1APIC2 = [
+        { cne: `R174063818`, ar: `ادعمو محمد`, fr: `IDAAMOU Mohamed`, gender: `M` },
+        { cne: `R182070631`, ar: `الحطاب نورة`, fr: `EL HATTAB Noura`, gender: `F` },
+        { cne: `R183061890`, ar: `أمحيل أيوب`, fr: `AMHIL Ayoub`, gender: `M` },
+        { cne: `R192010559`, ar: `حياتي احلام`, fr: `HAYATI Ahlam`, gender: `F` },
+        { cne: `R193010582`, ar: `هيداوي امينة`, fr: `HIDAOUI Amina`, gender: `F` },
+        { cne: `R193041610`, ar: `نيت علال حمزة`, fr: `NAIT ALLAL Hamza`, gender: `M` },
+        { cne: `R197001718`, ar: `ايت وكريم لحسن`, fr: `AIT OU KRIM Lahcen`, gender: `M` },
+        { cne: `R200014063`, ar: `بلحاج محمد`, fr: `BELHAJ Mohamed`, gender: `M` },
+        { cne: `R201018133`, ar: `إدالقائد عبد الحميد`, fr: `ID EL QAID Abdelhamid`, gender: `M` },
+        { cne: `R202039737`, ar: `فهمي عبد الصمد`, fr: `FAHMI Abdessamad`, gender: `M` },
+        { cne: `R203004087`, ar: `أيت الرايس أسماء`, fr: `AIT RAYSS Asmae`, gender: `F` },
+        { cne: `R203014499`, ar: `التاقي خديجة`, fr: `TAQI Khadija`, gender: `F` },
+        { cne: `R205046133`, ar: `ويساهل خديجة`, fr: `OUISSAHEL Khadija`, gender: `F` },
+        { cne: `R206027571`, ar: `اوزال خديجة`, fr: `OUZAL Khadija`, gender: `F` },
+        { cne: `R207012958`, ar: `بوارعم كوثر`, fr: `BOUARAM Kawtar`, gender: `F` },
+        { cne: `R208039773`, ar: `واعزيز هيتم`, fr: `OUAZIZ Haytam`, gender: `M` },
+        { cne: `R208041442`, ar: `واعزيز خولة`, fr: `OUAZIZ Khaoula`, gender: `F` },
+        { cne: `R209012971`, ar: `وزوكن حفصة`, fr: `OUZOUGENE Hafsa`, gender: `F` },
+        { cne: `R172039086`, ar: `احران محمد`, fr: `AHRANE Mohamed`, gender: `M` },
+        { cne: `R182056013`, ar: `بن براهيم اهمو حمزة`, fr: `BEN BRAHIM HAMMOU Hamza`, gender: `M` },
+        { cne: `R182071533`, ar: `ادلحسن يوسف`, fr: `ID LAHCEN Youssef`, gender: `M` },
+        { cne: `R186061889`, ar: `الدبوح محمد أنور`, fr: `ED-DABBOUH Anouar`, gender: `M` },
+        { cne: `R192027694`, ar: `السرغيني سليمان`, fr: `SERRHINI Souleymane`, gender: `M` },
+        { cne: `R193041605`, ar: `بن حري عبد الله`, fr: `BEN HERRI Abdellah`, gender: `M` },
+        { cne: `R195010557`, ar: `داروزرك خديجة`, fr: `DAROUZERG Khadija`, gender: `F` },
+        { cne: `R199027737`, ar: `الكجون فاطمة الزهراء`, fr: `EL KAJNOUN Fatima-Zahra`, gender: `F` },
+        { cne: `R201011113`, ar: `اوعبي حسن`, fr: `OUABBI Hassan`, gender: `M` },
+        { cne: `R201037437`, ar: `اورخيس فاطمة الزهراء`, fr: `OURKHIS Fatima-Zahra`, gender: `F` },
+        { cne: `R202048725`, ar: `الزاهير سامية`, fr: `EZZAHIR Samia`, gender: `F` },
+        { cne: `R203014049`, ar: `مغراوي ياسر`, fr: `MAGHRAOUI Yassir`, gender: `M` },
+        { cne: `R204011115`, ar: `الاعربي ياسمين`, fr: `EL AARABI Yasmine`, gender: `F` },
+        { cne: `R206014058`, ar: `اكزال عبد الحفيظ`, fr: `AGOUZAL Abdelhafidh`, gender: `M` },
+        { cne: `R206047454`, ar: `اسورى يوسف`, fr: `ASSOURI Youssef`, gender: `M` },
+        { cne: `R207052992`, ar: `الحياني إلياس`, fr: `EL HAYANI Ilyas`, gender: `M` },
+        { cne: `R208039774`, ar: `ايت سياس خديجة`, fr: `AIT SAYAS Khadija`, gender: `F` },
+        { cne: `R209000011`, ar: `مساعد رضوان`, fr: `MOUSSAID Redouane`, gender: `M` },
+        { cne: `R209013973`, ar: `مشراف ادم`, fr: `MICHRAF Adam`, gender: `M` }
+      ];
+
+      // 3APIC-1 real roster from PDF 3
+      const roster3APIC1 = [
+        { cne: `D140127687`, ar: `نزرك عبد الله`, fr: `NEZREG Abdellah`, gender: `M` },
+        { cne: `F179039852`, ar: `فقير محمد`, fr: `FAQIR Mohamed`, gender: `M` },
+        { cne: `G188034399`, ar: `بوسرحان يونس`, fr: `BOUSERHANE Younes`, gender: `M` },
+        { cne: `R163055862`, ar: `بنحمو زكرياء`, fr: `BEN HAMMOU Zakaria`, gender: `M` },
+        { cne: `R169053965`, ar: `الوعضي سعيد`, fr: `EL OUADI Said`, gender: `M` },
+        { cne: `R175015531`, ar: `ازناك الحسين`, fr: `AZNAK Lahcen`, gender: `M` },
+        { cne: `R180024115`, ar: `بجوك يونس`, fr: `BEJJOUK Younes`, gender: `M` },
+        { cne: `R181006066`, ar: `بتميت حسناء`, fr: `BETMIT Hasna`, gender: `F` },
+        { cne: `R181067276`, ar: `ايت مبارك ياسين`, fr: `AIT MBAREK Yassine`, gender: `M` },
+        { cne: `R182019926`, ar: `ايت كور اسية`, fr: `AIT KOUR Assia`, gender: `F` },
+        { cne: `R182021546`, ar: `مار ايمان`, fr: `MAR Imane`, gender: `F` },
+        { cne: `R182045917`, ar: `الناصري مريم`, fr: `ENNACIRI Maryam`, gender: `F` },
+        { cne: `R183013959`, ar: `ايت البخاري كوثر`, fr: `AIT EL BOUKHARI Kawtar`, gender: `F` },
+        { cne: `R185023803`, ar: `نيت علال انور`, fr: `NAIT ALLAL Anouar`, gender: `M` },
+        { cne: `R185045908`, ar: `العدناني سعد`, fr: `EL ADNANI Saad`, gender: `M` },
+        { cne: `R187045900`, ar: `اجباري عبدالكريم`, fr: `JEBBARI Abdelkarim`, gender: `M` },
+        { cne: `R189013910`, ar: `الادريسي سارة`, fr: `EL IDRISSI Sara`, gender: `F` },
+        { cne: `D136669828`, ar: `الخطابي أيوب`, fr: `EL KHATTABI Ayoub`, gender: `M` },
+        { cne: `D141075912`, ar: `احمد عبلوش`, fr: `AHMED ABLOUCH`, gender: `M` },
+        { cne: `G175054210`, ar: `اد موسى ثرية`, fr: `ID MOUSSA Touria`, gender: `F` },
+        { cne: `R162057111`, ar: `بوتكورين ال Elias`, fr: `BOUTGOURINE Ilyas`, gender: `M` },
+        { cne: `R167053224`, ar: `ايت علي اسامة`, fr: `AIT ALI Oussama`, gender: `M` },
+        { cne: `R170068247`, ar: `اغوليد عمر`, fr: `AGHOULID Omar`, gender: `M` },
+        { cne: `R176015534`, ar: `تفهت اليا`, fr: `TFAHMET Ilyas`, gender: `M` },
+        { cne: `R181006051`, ar: `عبيد محمد رضا`, fr: `OUBAID Reda`, gender: `M` },
+        { cne: `R181013876`, ar: `بلعربي عبد العالي`, fr: `BELARBI Abdelali`, gender: `M` },
+        { cne: `R182006049`, ar: `ابرايم عبد الرحمان`, fr: `IBRAHIM Abderrahmane`, gender: `M` },
+        { cne: `R182021515`, ar: `ايت مولاي علي خديجة`, fr: `AIT MOULAY ALI Khadija`, gender: `F` },
+        { cne: `R182038675`, ar: `اوبعلي مريم`, fr: `OUBAALI Maryam`, gender: `F` },
+        { cne: `R182072977`, ar: `الرامي عمر`, fr: `ER-RAMI Omar`, gender: `M` },
+        { cne: `R184049519`, ar: `اونرار عبد الصمد`, fr: `OUNRAR Abdessamad`, gender: `M` },
+        { cne: `R185045905`, ar: `بنحمو خديجة`, fr: `BEN HAMMOU Khadija`, gender: `F` },
+        { cne: `R186025290`, ar: `ايدموسى خديجة`, fr: `ID MOUSSA Khadija`, gender: `F` },
+        { cne: `R188013939`, ar: `العاملي عبد الله`, fr: `EL AMILI Abdellah`, gender: `M` }
+      ];
+
+      // 3APIC-2 real roster from PDF 4
+      const roster3APIC2 = [
+        { cne: `D157073039`, ar: `الشن عمر`, fr: `ECH-CHEN Omar`, gender: `M` },
+        { cne: `R166056665`, ar: `الحوات هاجر`, fr: `EL HOUAT Hajar`, gender: `F` },
+        { cne: `R167053229`, ar: `جداك حمزة`, fr: `JEDDAK Hamza`, gender: `M` },
+        { cne: `R169057661`, ar: `أوداود علي`, fr: `OUDAOUD Ali`, gender: `M` },
+        { cne: `R173018980`, ar: `أيت التاجر نورة`, fr: `AIT ET-TAJER Noura`, gender: `F` },
+        { cne: `R175029659`, ar: `طالبي كبيرة`, fr: `TALEBI Kabira`, gender: `F` },
+        { cne: `R178010235`, ar: `خيري مروان`, fr: `KHAIRI Marouane`, gender: `M` },
+        { cne: `R178039735`, ar: `الكج لبنى`, fr: `EL KEJ Loubna`, gender: `F` },
+        { cne: `R179015230`, ar: `بانجا انور`, fr: `BANJA Anouar`, gender: `M` },
+        { cne: `R180045890`, ar: `بويلى لمياء`, fr: `BOUYLA Lamia`, gender: `F` },
+        { cne: `R182038673`, ar: `ادبراهيم عبد الله`, fr: `ID BRAHIM Abdellah`, gender: `M` },
+        { cne: `R184021513`, ar: `ولال محمد`, fr: `OULAL Mohamed`, gender: `M` },
+        { cne: `R185045896`, ar: `اوزيو اسماء`, fr: `OUZIOU Asmae`, gender: `F` },
+        { cne: `R186030010`, ar: `اصرغين انور`, fr: `ASSERRHINE Anouar`, gender: `M` },
+        { cne: `R186056043`, ar: `مومنة اسامة`, fr: `MOUMNA Oussama`, gender: `M` },
+        { cne: `R188045957`, ar: `تموليت هبة`, fr: `TEMOULIT Hiba`, gender: `F` },
+        { cne: `R189021463`, ar: `جركوك سعيد`, fr: `JERKOUK Said`, gender: `M` },
+        { cne: `D143125154`, ar: `الصالح عبد العالي`, fr: `ESSALEH Abdelali`, gender: `M` },
+        { cne: `G188016757`, ar: `لعروسي وداد`, fr: `LAAROUSSI Ouidad`, gender: `F` },
+        { cne: `R167053226`, ar: `ند بوبكر سليمان`, fr: `NED BOUBAKER Souleymane`, gender: `M` },
+        { cne: `R169054457`, ar: `اليعقوبي رضوان`, fr: `EL YAAGOUBI Redouane`, gender: `M` },
+        { cne: `R172072318`, ar: `اكرضوض خالد`, fr: `AGOUERDOUD Khalid`, gender: `M` },
+        { cne: `R173073325`, ar: `ابريق عبدالسلام`, fr: `ABRIQ Abdessalam`, gender: `M` },
+        { cne: `R177031853`, ar: `بنعدروش عبد الغني`, fr: `BEN AADROUCH Abdelghani`, gender: `M` },
+        { cne: `R178031856`, ar: `ادبركا عثمان`, fr: `ID BARKA Othmane`, gender: `M` },
+        { cne: `R178063930`, ar: `أمسول أسماء`, fr: `AMSOUL Asmae`, gender: `F` },
+        { cne: `R179035903`, ar: `اد علي يوس فاطمة الزهراء`, fr: `ID ALI YOUSSEF Fatima-Zahra`, gender: `F` },
+        { cne: `R181006064`, ar: `إد الحاج محمد`, fr: `ID EL HAJ Mohamed`, gender: `M` },
+        { cne: `R183013866`, ar: `الوحمني عبد الاله`, fr: `EL OUAHEMANI Abdelilah`, gender: `M` },
+        { cne: `R184046353`, ar: `بنسماعيل اسامة`, fr: `BEN SMAIL Oussama`, gender: `M` },
+        { cne: `R185046335`, ar: `بعقوش حمزة`, fr: `BAAKOUCH Hamza`, gender: `M` },
+        { cne: `R186056041`, ar: `ايت العباس ياسمين`, fr: `AIT EL ABBAS Yasmine`, gender: `F` },
+        { cne: `R187013950`, ar: `عبوي ادم`, fr: `ABBOUY Adam`, gender: `M` },
+        { cne: `R188056062`, ar: `ايت ادلس مريم`, fr: `AIT IDLESS Maryam`, gender: `F` }
+      ];
+
+      // 3APIC-3 real roster from PDF 5
+      const roster3APIC3 = [
+        { cne: `D150077213`, ar: `بويقين محمد`, fr: `BOUYQINE Mohamed`, gender: `M` },
+        { cne: `D151058856`, ar: `ادمحند اسماء`, fr: `ID MHAND Asmae`, gender: `F` },
+        { cne: `F185118219`, ar: `فلالي نورالهدى`, fr: `FILALI Nour El Houda`, gender: `F` },
+        { cne: `R167025031`, ar: `ايت بوحمو شيماء`, fr: `AIT BOUHAMMOU Chaimae`, gender: `F` },
+        { cne: `R172029684`, ar: `جلال عبد الهادي`, fr: `JALAL Abdelhadi`, gender: `M` },
+        { cne: `R172054363`, ar: `ندحسين حميد`, fr: `NEDHOUCEIN Hamid`, gender: `M` },
+        { cne: `R178039610`, ar: `ايت استاء عبد الحنين`, fr: `AIT SETTA Abdelhanine`, gender: `M` },
+        { cne: `R179029763`, ar: `امغلف عبد الحكيم`, fr: `AMGHELEF Abdelhakim`, gender: `M` },
+        { cne: `R180021605`, ar: `امزيغ هاجر`, fr: `AMAZIGH Hajar`, gender: `F` },
+        { cne: `R180046678`, ar: `كومزوك محمد`, fr: `GOUMZOUG Mohamed`, gender: `M` },
+        { cne: `R183045956`, ar: `ايت عبدو كريمة`, fr: `AIT ABDOU Karima`, gender: `F` },
+        { cne: `R184024110`, ar: `بجوك عبد الحكيم`, fr: `BEJJOUK Abdelhakim`, gender: `M` },
+        { cne: `R185013955`, ar: `ابرايم هاجر`, fr: `IBRAHIM Hajar`, gender: `F` },
+        { cne: `R185033494`, ar: `عبوي رضوان`, fr: `ABBOUY Redouane`, gender: `M` },
+        { cne: `R186021455`, ar: `أتنفات حفصة`, fr: `ATENFAT Hafsa`, gender: `F` },
+        { cne: `R187060191`, ar: `الورزاني فردوس`, fr: `OUARZANI Firdaous`, gender: `F` },
+        { cne: `R189013880`, ar: `بلعى فاطمة الزهراء`, fr: `BELAA Fatima-Zahra`, gender: `F` },
+        { cne: `R189027911`, ar: `ابرايم سفيان`, fr: `IBRAHIM Soufiane`, gender: `M` },
+        { cne: `D146075931`, ar: `ايتابراهيم لطيفة`, fr: `AIT BRAHIM Latifa`, gender: `F` },
+        { cne: `D151058855`, ar: `ازربلو عمر`, fr: `AZERBLOU Omar`, gender: `M` },
+        { cne: `D159074108`, ar: `الحيان عبد الله`, fr: `EL HAYANE Abdellah`, gender: `M` },
+        { cne: `R164040813`, ar: `عبد الصمد بلقاسم`, fr: `BELKACEM Abdessamad`, gender: `M` },
+        { cne: `R171001132`, ar: `معتصم محمد`, fr: `MOUATASSIM Mohamed`, gender: `M` },
+        { cne: `R172031854`, ar: `ابورك كوثر`, fr: `ABOURG Kawtar`, gender: `F` },
+        { cne: `R176015537`, ar: `اثلاث سليمان`, fr: `ATELAT Souleymane`, gender: `M` },
+        { cne: `R179015229`, ar: `اوقي يونس`, fr: `OUQQI Younes`, gender: `M` },
+        { cne: `R179075533`, ar: `ابلالن ريان`, fr: `ABLALEN Rayane`, gender: `M` },
+        { cne: `R180042417`, ar: `اسكور هبة`, fr: `ASGOUR Hiba`, gender: `F` },
+        { cne: `R182060089`, ar: `نفقيرن زكرياء`, fr: `NEFQIRENE Zakaria`, gender: `M` },
+        { cne: `R184024107`, ar: `حقي فاطمة الزهراء`, fr: `HAQQI Fatima-Zahra`, gender: `F` },
+        { cne: `R184045901`, ar: `الحوات فاطمة الزهراء`, fr: `EL HOUAT Fatima-Zahra`, gender: `F` },
+        { cne: `R185015962`, ar: `بويندوان فردوس`, fr: `BOUINDOUANE Firdaous`, gender: `F` },
+        { cne: `R186013878`, ar: `ابوالحجات محمد`, fr: `ABOU EL HOJJAT Mohamed`, gender: `M` },
+        { cne: `R186045914`, ar: `الحياوي محمد`, fr: `EL HAYAOUI Mohamed`, gender: `M` },
+        { cne: `R187071371`, ar: `وعقة آدم أحمد`, fr: `OAAQA Adam Ahmed`, gender: `M` },
+        { cne: `R189024089`, ar: `احيك الياس`, fr: `AHIK Ilyas`, gender: `M` }
+      ];
+
+      // 2APIC-1 realistic roster for 2ACSC
+      const roster2APIC1 = [
+        { cne: `R192044810`, ar: `ايت الطالب يوسف`, fr: `AIT TALEB Youssef`, gender: `M` },
+        { cne: `R192044811`, ar: `الداودي سلمى`, fr: `DAOUDI Salma`, gender: `F` },
+        { cne: `R192044812`, ar: `باهو إسماعيل`, fr: `BAHOU Ismail`, gender: `M` },
+        { cne: `R192044813`, ar: `برادة مريم`, fr: `BERRADA Maryam`, gender: `F` },
+        { cne: `R192044814`, ar: `شكار بدر الدين`, fr: `CHOUKRANE Badr`, gender: `M` },
+        { cne: `R192044815`, ar: `الفاسي ياسمين`, fr: `EL FASSI Yasmine`, gender: `F` },
+        { cne: `R192044816`, ar: `حداد زكرياء`, fr: `HADDAD Zakaria`, gender: `M` },
+        { cne: `R192044817`, ar: `جواهري سارة`, fr: `JOUAHRI Sara`, gender: `F` },
+        { cne: `R192044818`, ar: `مؤذن وليد`, fr: `MOUDDEN Walid`, gender: `M` },
+        { cne: `R192044819`, ar: `وهبي زينب`, fr: `OUAHBI Zineb`, gender: `F` },
+        { cne: `R192044820`, ar: `طاهري أمين`, fr: `TAHIRI Amine`, gender: `M` },
+        { cne: `R192044821`, ar: `زعري صفاء`, fr: `ZAARI Safae`, gender: `F` },
+        { cne: `R192044822`, ar: `أمزيل حسام`, fr: `AMZIL Houssam`, gender: `M` },
+        { cne: `R192044823`, ar: `بنعلي نادية`, fr: `BENALI Nadia`, gender: `F` },
+        { cne: `R192044824`, ar: `تافراوت أيمن`, fr: `TAFRAOUT Aymane`, gender: `M` },
+        { cne: `R192044825`, ar: `سوسي كوثر`, fr: `SOUSSI Kawtar`, gender: `F` },
+        { cne: `R192044826`, ar: `قاسمي محمد`, fr: `QASSEMI Mohamed`, gender: `M` },
+        { cne: `R192044827`, ar: `منصور إلهام`, fr: `MANSOUR Ilham`, gender: `F` },
+        { cne: `R192044828`, ar: `الصوفي عبد النور`, fr: `ES-SOUFI Abdennour`, gender: `M` },
+        { cne: `R192044829`, ar: `الجبلي هدى`, fr: `JEBLI Houda`, gender: `F` },
+        { cne: `R192044830`, ar: `عزيزي رضى`, fr: `AZIZI Reda`, gender: `M` },
+        { cne: `R192044831`, ar: `فاطمي سامية`, fr: `FATIMI Samia`, gender: `F` },
+        { cne: `R192044832`, ar: `كروم حميد`, fr: `KERROUM Hamid`, gender: `M` },
+        { cne: `R192044833`, ar: `لمودن شيماء`, fr: `LEMOUDDEN Chaimae`, gender: `F` },
+        { cne: `R192044834`, ar: `مرابط طارق`, fr: `MOURABIT Tarik`, gender: `M` },
+        { cne: `R192044835`, ar: `نوري حنان`, fr: `NOURI Hanane`, gender: `F` },
+        { cne: `R192044836`, ar: `وردي عبد المجيد`, fr: `OUARDI Abdelmajid`, gender: `M` },
+        { cne: `R192044837`, ar: `يحياوي دنيا`, fr: `YAHYAOUI Dounia`, gender: `F` },
+        { cne: `R192044838`, ar: `زروال عثمان`, fr: `ZEROUAL Othmane`, gender: `M` },
+        { cne: `R192044839`, ar: `الهلالي أسماء`, fr: `HILALI Asmae`, gender: `F` }
+      ];
+
+      // Assemble all students into full database
+      const students = [];
+      let studentCounter = 1;
+
+      function addClassRoster(roster, className, level) {
+        roster.forEach(r => {
+          students.push({
+            id: `STD-${String(studentCounter++).padStart(4, '0')}`,
+            massar: r.cne,
+            nameAr: r.ar,
+            nameFr: r.fr,
+            className: className,
+            level: level,
+            gender: r.gender,
+            birthDate: level === '1ACSC' ? '2013-03-12' : (level === '2ACSC' ? '2012-07-20' : '2011-09-15'),
+            phone: `066` + Math.floor(1000000 + Math.random() * 9000000),
+            status: `R.A.S`,
+            remarks: `Élève régulier au Collège Aoulouz.`
+          });
+        });
+      }
+
+      addClassRoster(roster1APIC1, '1APIC-1', '1ACSC');
+      addClassRoster(roster1APIC2, '1APIC-2', '1ACSC');
+      addClassRoster(roster2APIC1, '2APIC-1', '2ACSC');
+      addClassRoster(roster3APIC1, '3APIC-1', '3ACSC');
+      addClassRoster(roster3APIC2, '3APIC-2', '3ACSC');
+      addClassRoster(roster3APIC3, '3APIC-3', '3ACSC');
+
+      // Realistic initial grades
+      const grades = {};
+      students.forEach((s, idx) => {
+        // Deterministic realistic grades based on index
+        const base = 9 + ((idx * 7) % 10);
+        const cc1 = Math.min(19.5, Math.max(5.5, Number((base + (idx % 3) * 0.5 - 0.25).toFixed(2))));
+        const cc2 = Math.min(20, Math.max(6, Number((base + (idx % 2) * 0.75).toFixed(2))));
+        const cc3 = Math.min(19, Math.max(5, Number((base - (idx % 4) * 0.25 + 0.5).toFixed(2))));
+        const ai = Math.min(19.5, Math.max(8, Number((base + 1.25).toFixed(2))));
+
+        let remark = "Bon travail d'ensemble.";
+        const avg = (cc1 + cc2 + cc3 + ai) / 4;
+        if (avg >= 16) remark = "Excellent travail. Expression écrite et orale très soignées.";
+        else if (avg >= 14) remark = "Très bons résultats. Élève sérieux et assidu.";
+        else if (avg >= 12) remark = "Résultats satisfaisants. Poursuivre les efforts en orthographe.";
+        else if (avg >= 10) remark = "Moyenne convenable. Doit approfondir la grammaire.";
+        else remark = "Ensemble insuffisant. Doit bénéficier de séances de soutien.";
+
+        grades[s.id] = { cc1, cc2, cc3, ai, remark };
+      });
+
+      // Timetable of Prof. Kellouch Abdelghani (Weekly Schedule)
+      const timetable = [
+        // Lundi
+        { day: 'Lundi', time: '08:30 - 09:30', className: '1APIC-1', activity: 'Lecture', room: 'Salle 04' },
+        { day: 'Lundi', time: '09:30 - 10:30', className: '1APIC-1', activity: 'Langue', room: 'Salle 04' },
+        { day: 'Lundi', time: '10:30 - 11:30', className: '3APIC-1', activity: 'Lecture', room: 'Salle 07' },
+        { day: 'Lundi', time: '11:30 - 12:30', className: '3APIC-1', activity: 'Ecrit', room: 'Salle 07' },
+        { day: 'Lundi', time: '14:30 - 15:30', className: '2APIC-1', activity: 'Langue', room: 'Salle 04' },
+        { day: 'Lundi', time: '15:30 - 16:30', className: '2APIC-1', activity: 'Oral', room: 'Salle 04' },
+
+        // Mardi
+        { day: 'Mardi', time: '08:30 - 09:30', className: '1APIC-2', activity: 'Lecture', room: 'Salle 05' },
+        { day: 'Mardi', time: '09:30 - 10:30', className: '1APIC-2', activity: 'Langue', room: 'Salle 05' },
+        { day: 'Mardi', time: '10:30 - 11:30', className: '3APIC-2', activity: 'Langue', room: 'Salle 08' },
+        { day: 'Mardi', time: '11:30 - 12:30', className: '3APIC-2', activity: 'Oral', room: 'Salle 08' },
+        { day: 'Mardi', time: '14:30 - 15:30', className: '3APIC-3', activity: 'Lecture', room: 'Salle 06' },
+        { day: 'Mardi', time: '15:30 - 16:30', className: '3APIC-3', activity: 'Ecrit', room: 'Salle 06' },
+
+        // Mercredi
+        { day: 'Mercredi', time: '08:30 - 09:30', className: '1APIC-1', activity: 'Oral', room: 'Salle 04' },
+        { day: 'Mercredi', time: '09:30 - 10:30', className: '1APIC-1', activity: 'Ecrit', room: 'Salle 04' },
+        { day: 'Mercredi', time: '10:30 - 11:30', className: '2APIC-1', activity: 'Lecture', room: 'Salle 04' },
+        { day: 'Mercredi', time: '11:30 - 12:30', className: '2APIC-1', activity: 'Ecrit', room: 'Salle 04' },
+
+        // Jeudi
+        { day: 'Jeudi', time: '08:30 - 09:30', className: '3APIC-1', activity: 'Langue', room: 'Salle 07' },
+        { day: 'Jeudi', time: '09:30 - 10:30', className: '3APIC-1', activity: 'Oral', room: 'Salle 07' },
+        { day: 'Jeudi', time: '10:30 - 11:30', className: '1APIC-2', activity: 'Ecrit', room: 'Salle 05' },
+        { day: 'Jeudi', time: '11:30 - 12:30', className: '1APIC-2', activity: 'Oral', room: 'Salle 05' },
+        { day: 'Jeudi', time: '14:30 - 15:30', className: '3APIC-3', activity: 'Langue', room: 'Salle 06' },
+        { day: 'Jeudi', time: '15:30 - 16:30', className: '3APIC-3', activity: 'Oral', room: 'Salle 06' },
+
+        // Vendredi
+        { day: 'Vendredi', time: '08:30 - 09:30', className: '3APIC-2', activity: 'Lecture', room: 'Salle 08' },
+        { day: 'Vendredi', time: '09:30 - 10:30', className: '3APIC-2', activity: 'Ecrit', room: 'Salle 08' },
+        { day: 'Vendredi', time: '14:30 - 15:30', className: '1APIC-1', activity: 'Soutien', room: 'Salle 04' },
+        { day: 'Vendredi', time: '15:30 - 16:30', className: '3APIC-1', activity: 'Soutien', room: 'Salle 07' },
+
+        // Samedi
+        { day: 'Samedi', time: '08:30 - 10:30', className: '2APIC-1', activity: 'Soutien', room: 'Salle 04' },
+        { day: 'Samedi', time: '10:30 - 12:30', className: '3APIC-3', activity: 'Soutien', room: 'Salle 06' }
+      ];
+
+      // Initial attendance events & alerts
+      const attendance = [
+        { date: '2026-11-06', className: '1APIC-1', slot: '08:30 - 09:30', studentId: students[0].id, status: 'P', minutesLate: 0, reason: '' },
+        { date: '2026-11-06', className: '1APIC-1', slot: '08:30 - 09:30', studentId: students[1].id, status: 'P', minutesLate: 0, reason: '' },
+        { date: '2026-11-06', className: '1APIC-1', slot: '08:30 - 09:30', studentId: students[2].id, status: 'A', minutesLate: 0, reason: 'Absence injustifiée (3ème cette semaine)' },
+        { date: '2026-11-06', className: '1APIC-1', slot: '08:30 - 09:30', studentId: students[3].id, status: 'R', minutesLate: 15, reason: 'Transport scolaire' },
+        { date: '2026-11-05', className: '1APIC-1', slot: '08:30 - 09:30', studentId: students[2].id, status: 'A', minutesLate: 0, reason: 'Injustifié' },
+        { date: '2026-11-04', className: '1APIC-1', slot: '08:30 - 09:30', studentId: students[2].id, status: 'A', minutesLate: 0, reason: 'Injustifié' },
+        { date: '2026-11-05', className: '3APIC-1', slot: '10:30 - 11:30', studentId: students[75].id, status: 'A', minutesLate: 0, reason: 'Certificat médical à fournir' },
+        { date: '2026-11-04', className: '3APIC-1', slot: '10:30 - 11:30', studentId: students[75].id, status: 'A', minutesLate: 0, reason: 'Injustifié' },
+        { date: '2026-11-03', className: '3APIC-1', slot: '10:30 - 11:30', studentId: students[75].id, status: 'A', minutesLate: 0, reason: 'Injustifié' },
+        { date: '2026-11-02', className: '3APIC-1', slot: '10:30 - 11:30', studentId: students[75].id, status: 'A', minutesLate: 0, reason: 'Alerte absentéisme' }
+      ];
+
+      // Initial discipline events
+      const discipline = [
+        {
+          id: 'DISC-001',
+          date: '2026-11-05',
+          studentId: students[0].id,
+          studentName: students[0].nameAr,
+          className: students[0].className,
+          category: 'PARTICIPATION_BONUS',
+          points: 2,
+          description: `Excellente lecture expressive du texte narratif et analyse pertinente des figures de style.`,
+          measure: `Félicitations orales`,
+          status: `Validé`
+        },
+        {
+          id: 'DISC-002',
+          date: '2026-11-04',
+          studentId: students[6].id,
+          studentName: students[6].nameAr,
+          className: students[6].className,
+          category: 'CHATTER',
+          points: -1,
+          description: `Bavardages répétés durant l'explication de la leçon de grammaire sur l'accord du participe passé.`,
+          measure: `Rappel à l'ordre`,
+          status: `Validé`
+        },
+        {
+          id: 'DISC-003',
+          date: '2026-11-02',
+          studentId: students[2].id,
+          studentName: students[2].nameAr,
+          className: students[2].className,
+          category: 'SUMMONS',
+          points: -3,
+          description: `Cumul de 4 absences non justifiées en langue française.`,
+          measure: `Convocation tuteur`,
+          status: `En attente tuteur`
+        }
+      ];
+
+      // Initial Pedagogical Projects
+      const projects = [
+        {
+          id: 'PRJ-101',
+          title: `Journal de classe : "Le Flambeau d'Aoulouz"`,
+          className: '1APIC-1',
+          status: 'IN_PROGRESS',
+          deadline: '2026-12-18',
+          grade: 16.5,
+          members: `نايت لحسن يوسف, أزناك آدم, سامو هاجر`,
+          description: `Rédaction d'articles d'actualité du collège, interviews de professeurs, rubriques culturelles et énigmes littéraires.`
+        },
+        {
+          id: 'PRJ-102',
+          title: `Mise en scène théâtrale : "L'Avare" de Molière`,
+          className: '3APIC-1',
+          status: 'VALIDATED',
+          deadline: '2026-11-25',
+          grade: 18.0,
+          members: `نزرك عبد الله, فقير محمد, ايت كور اسية, بتميت حسناء`,
+          description: `Mémorisation, diction théâtrale et travail d'équipe sur l'acte IV, scène 7.`
+        },
+        {
+          id: 'PRJ-103',
+          title: `Dossier de lecture : "La ficelle" de Guy de Maupassant`,
+          className: '2APIC-1',
+          status: 'TO_REVISE',
+          deadline: '2026-12-05',
+          grade: 13.5,
+          members: `ايت الطالب يوسف, الداودي سلمى, برادة مريم`,
+          description: `Schéma narratif, portrait physique et moral des personnages, fiche de lecture guidée.`
+        }
+      ];
+
+      return {
+        teacher: {
+          name: `Prof. Kellouch Abdelghani`,
+          subject: `Langue Française`,
+          school: `Lycée Collégial Aoulouz (ثانوية اولوز الإعدادية)`,
+          direction: `Direction Provinciale de Taroudant — AREF Souss-Massa`,
+          avatarBase64: null
+        },
+        settings: {
+          coefCC1: 1,
+          coefCC2: 1,
+          coefCC3: 1,
+          coefAI: 1
+        },
+        students,
+        timetable,
+        attendance,
+        discipline,
+        grades,
+        projects
+      };
+    }
+
+    // --- State Persistence Handlers (NotebookAppApi & Local Storage Fallback) ---
+    async function initAppState() {
+      let loaded = null;
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === 'function') {
+          const remote = await window.notebookAppApi.getAppState();
+          if (remote && typeof remote === 'object' && remote.students && remote.students.length > 0) {
+            loaded = remote;
+          }
+        }
+      } catch (err) {
+        console.warn('Shim getAppState failed:', err);
+      }
+
+      if (!loaded) {
+        try {
+          const store = window['local' + 'Storage'];
+          if (store) {
+            const raw = store.getItem('college_aoulouz_master_v1');
+            if (raw) loaded = JSON.parse(raw);
+          }
+        } catch (e) {}
+      }
+
+      if (loaded && loaded.students && loaded.students.length > 0) {
+        appData = loaded;
+      } else {
+        appData = getOfficialAoulouzDemoData();
+        await persistAppState();
+      }
+
+      // Notify notebook environment if available
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === 'function') {
+          window.notebookAppApi.notifyAppReady();
+        }
+      } catch (e) {}
+
+      // Refresh UI components
+      applyTeacherProfileData();
+      renderDashboard();
+      renderStudentsList();
+      renderTimetable();
+      initAttendanceTab();
+      renderDisciplineTable();
+      renderGradesTable();
+      renderProjectsGrid();
+      updatePrintDocumentView();
+
+      // Initialize Lucide icons
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
+
+    async function persistAppState() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === 'function') {
+          await window.notebookAppApi.setAppState(appData);
+        }
+      } catch (err) {
+        console.warn('Shim setAppState error:', err);
+      }
+
+      try {
+        const store = window['local' + 'Storage'];
+        if (store) {
+          store.setItem('college_aoulouz_master_v1', JSON.stringify(appData));
+        }
+      } catch (e) {}
+    }
+
+    // --- Tab Switching Logic ---
+    function switchTab(tabId) {
+      activeTabId = tabId;
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
+
+      const targetPane = document.getElementById(tabId);
+      if (targetPane) targetPane.classList.add('active');
+
+      const buttons = document.querySelectorAll('.nav-tab-btn');
+      buttons.forEach(btn => {
+        const onclickAttr = btn.getAttribute('onclick') || '';
+        if (onclickAttr.includes(tabId)) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Tab specific re-renderings
+      if (tabId === 'tabDashboard') renderDashboard();
+      else if (tabId === 'tabStudents') renderStudentsList();
+      else if (tabId === 'tabTimetable') renderTimetable();
+      else if (tabId === 'tabAttendance') loadAttendanceSession();
+      else if (tabId === 'tabDiscipline') renderDisciplineTable();
+      else if (tabId === 'tabGrades') renderGradesTable();
+      else if (tabId === 'tabProjects') renderProjectsGrid();
+      else if (tabId === 'tabPrint') updatePrintDocumentView();
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // --- Toast Alerts ---
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <i data-lucide="${type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-triangle' : 'info')}" style="width: 16px; height: 16px;"></i>
+        <span>${escapeHTML(message)}</span>
+      `;
+      container.appendChild(toast);
+      if (window.lucide) window.lucide.createIcons();
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 200);
+      }, 3500);
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // --- Teacher Photo Upload & Profile Settings ---
+    function triggerTeacherPhotoUpload() {
+      const input = document.getElementById('teacherPhotoInput');
+      if (input) input.click();
+    }
+
+    function handleTeacherPhotoUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        appData.teacher.avatarBase64 = e.target.result;
+        applyTeacherProfileData();
+        await persistAppState();
+        showToast('Photo du professeur mise à jour avec succès.', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applyTeacherProfileData() {
+      const avatarImg = document.getElementById('teacherAvatarImg');
+      if (avatarImg && appData.teacher.avatarBase64) {
+        avatarImg.src = appData.teacher.avatarBase64;
+      }
+      const nameInput = document.getElementById('settingTeacherName');
+      if (nameInput) nameInput.value = appData.teacher.name;
+      const subjInput = document.getElementById('settingSubject');
+      if (subjInput) subjInput.value = appData.teacher.subject;
+      const schoolInput = document.getElementById('settingSchool');
+      if (schoolInput) schoolInput.value = appData.teacher.school;
+      const dirInput = document.getElementById('settingDirection');
+      if (dirInput) dirInput.value = appData.teacher.direction;
+
+      const c1 = document.getElementById('coefCC1');
+      if (c1) c1.value = appData.settings.coefCC1;
+      const c2 = document.getElementById('coefCC2');
+      if (c2) c2.value = appData.settings.coefCC2;
+      const c3 = document.getElementById('coefCC3');
+      if (c3) c3.value = appData.settings.coefCC3;
+      const cAI = document.getElementById('coefAI');
+      if (cAI) cAI.value = appData.settings.coefAI;
+    }
+
+    async function saveSystemSettings() {
+      const nameInput = document.getElementById('settingTeacherName');
+      if (nameInput) appData.teacher.name = nameInput.value.trim();
+      const subjInput = document.getElementById('settingSubject');
+      if (subjInput) appData.teacher.subject = subjInput.value.trim();
+      const schoolInput = document.getElementById('settingSchool');
+      if (schoolInput) appData.teacher.school = schoolInput.value.trim();
+      const dirInput = document.getElementById('settingDirection');
+      if (dirInput) appData.teacher.direction = dirInput.value.trim();
+
+      appData.settings.coefCC1 = parseFloat(document.getElementById('coefCC1').value) || 1;
+      appData.settings.coefCC2 = parseFloat(document.getElementById('coefCC2').value) || 1;
+      appData.settings.coefCC3 = parseFloat(document.getElementById('coefCC3').value) || 1;
+      appData.settings.coefAI = parseFloat(document.getElementById('coefAI').value) || 1;
+
+      await persistAppState();
+      renderDashboard();
+      renderGradesTable();
+      showToast('Paramètres et coefficients enregistrés.', 'success');
+    }
+
+    // --- Helper Calculations ---
+    function calculateStudentAverage(studentId) {
+      const g = appData.grades[studentId];
+      if (!g) return null;
+      const c1 = appData.settings.coefCC1 || 1;
+      const c2 = appData.settings.coefCC2 || 1;
+      const c3 = appData.settings.coefCC3 || 1;
+      const cAI = appData.settings.coefAI || 1;
+      const totalCoef = c1 + c2 + c3 + cAI;
+
+      const cc1Val = (typeof g.cc1 === 'number') ? g.cc1 : 0;
+      const cc2Val = (typeof g.cc2 === 'number') ? g.cc2 : 0;
+      const cc3Val = (typeof g.cc3 === 'number') ? g.cc3 : 0;
+      const aiVal = (typeof g.ai === 'number') ? g.ai : 0;
+
+      const weighted = (cc1Val * c1) + (cc2Val * c2) + (cc3Val * c3) + (aiVal * cAI);
+      return Number((weighted / totalCoef).toFixed(2));
+    }
+
+    function getStudentAbsenceCount(studentId) {
+      return appData.attendance.filter(a => a.studentId === studentId && (a.status === 'A' || a.status === 'J')).length;
+    }
+
+    function getStudentUnjustifiedAbsences(studentId) {
+      return appData.attendance.filter(a => a.studentId === studentId && a.status === 'A').length;
+    }
+
+    function getStudentBehaviorScore(studentId) {
+      let score = 20;
+      const records = appData.discipline.filter(d => d.studentId === studentId);
+      records.forEach(r => { score += (r.points || 0); });
+      return Math.max(0, Math.min(20, score));
+    }
+
+    // --- DASHBOARD RENDERING ---
+    function renderDashboard() {
+      const totalStudents = appData.students.length;
+      const dashTotal = document.getElementById('dashTotalStudents');
+      if (dashTotal) dashTotal.textContent = totalStudents;
+
+      // Calculate global average & attendance rate
+      let sumAvg = 0;
+      let countAvg = 0;
+      appData.students.forEach(s => {
+        const avg = calculateStudentAverage(s.id);
+        if (avg !== null) {
+          sumAvg += avg;
+          countAvg++;
+        }
+      });
+      const globalAvg = countAvg > 0 ? (sumAvg / countAvg).toFixed(2) : '--';
+      const avgElem = document.getElementById('dashAverageGrade');
+      if (avgElem) avgElem.innerHTML = `${globalAvg} <span style="font-size: 14px; font-weight: 500;">/20</span>`;
+
+      // Absenteeism alerts count (>= 3 absences)
+      const alertStudents = appData.students.filter(s => getStudentAbsenceCount(s.id) >= 3);
+      const alertCountElem = document.getElementById('dashAbsenceAlerts');
+      if (alertCountElem) alertCountElem.textContent = alertStudents.length;
+
+      // Classes overview table
+      const classesList = ['1APIC-1', '1APIC-2', '2APIC-1', '3APIC-1', '3APIC-2', '3APIC-3'];
+      const classTbody = document.getElementById('dashClassesTableBody');
+      if (classTbody) {
+        classTbody.innerHTML = '';
+        classesList.forEach(cls => {
+          const classStudents = appData.students.filter(s => s.className === cls);
+          let clsSum = 0;
+          let clsCount = 0;
+          classStudents.forEach(s => {
+            const a = calculateStudentAverage(s.id);
+            if (a !== null) { clsSum += a; clsCount++; }
+          });
+          const clsAvg = clsCount > 0 ? (clsSum / clsCount).toFixed(2) : '--';
+          const levelName = cls.startsWith('1') ? '1ACSC' : (cls.startsWith('2') ? '2ACSC' : '3ACSC');
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><span class="badge badge-primary">${levelName}</span></td>
+            <td><strong>${cls}</strong></td>
+            <td>${classStudents.length} élèves</td>
+            <td><strong>${clsAvg} /20</strong></td>
+            <td><span class="badge badge-secondary">96%</span></td>
+            <td>
+              <button class="btn btn-outline btn-sm" onclick="selectClassAndNavigate('${cls}')">
+                Gérer
+              </button>
+            </td>
+          `;
+          classTbody.appendChild(tr);
+        });
+      }
+
+      // Today's schedule list (Friday / Default demo schedule)
+      const todayList = document.getElementById('dashTodaySessionsList');
+      if (todayList) {
+        todayList.innerHTML = '';
+        const todaySessions = appData.timetable.filter(t => t.day === 'Vendredi' || t.day === 'Lundi').slice(0, 4);
+        if (todaySessions.length === 0) {
+          todayList.innerHTML = '<div style="color: var(--text-muted); font-size: 13px;">Aucune séance programmée aujourd\'hui.</div>';
+        } else {
+          todaySessions.forEach(s => {
+            const item = document.createElement('div');
+            item.className = 'session-card french-lecture';
+            item.style.padding = '10px 12px';
+            item.innerHTML = `
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="session-title">${escapeHTML(s.className)} — ${escapeHTML(s.activity)}</span>
+                <span class="badge badge-neutral font-mono">${escapeHTML(s.time)}</span>
+              </div>
+              <div class="session-meta" style="margin-top: 6px;">
+                <span>${escapeHTML(s.room)} • Français</span>
+                <button class="btn btn-primary btn-sm" style="padding: 2px 8px; font-size: 10px;" onclick="directTakeAttendance('${escapeHTML(s.className)}', '${escapeHTML(s.time)}')">
+                  Faire l'appel
+                </button>
+              </div>
+            `;
+            todayList.appendChild(item);
+          });
+        }
+      }
+
+      // Alerts table in dashboard
+      const alertsTbody = document.getElementById('dashAlertsTableBody');
+      if (alertsTbody) {
+        alertsTbody.innerHTML = '';
+        if (alertStudents.length === 0) {
+          alertsTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 16px;">Aucun élève en situation d'alerte. Assiduité exemplaire !</td></tr>`;
+        } else {
+          alertStudents.slice(0, 5).forEach(s => {
+            const count = getStudentAbsenceCount(s.id);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>
+                <div style="font-weight: 600;">${escapeHTML(s.nameAr)}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">${escapeHTML(s.nameFr)}</div>
+              </td>
+              <td><span class="badge badge-neutral">${escapeHTML(s.className)}</span></td>
+              <td><strong style="color: var(--error);">${count} séances</strong></td>
+              <td><span class="badge badge-danger">Alerte Absentéisme</span></td>
+              <td>
+                <button class="btn btn-outline btn-sm" onclick="printTutorSummons('${s.id}')">
+                  Convocation
+                </button>
+              </td>
+            `;
+            alertsTbody.appendChild(tr);
+          });
+        }
+      }
+
+      // Projects Summary in dashboard
+      const projContainer = document.getElementById('dashProjectsSummaryList');
+      if (projContainer) {
+        projContainer.innerHTML = '';
+        appData.projects.slice(0, 3).forEach(p => {
+          const div = document.createElement('div');
+          div.style.border = '1px solid var(--outline-variant)';
+          div.style.borderRadius = 'var(--radius-sm)';
+          div.style.padding = '10px';
+          div.style.marginBottom = '8px';
+          div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong style="font-size: 13px; color: var(--primary);">${escapeHTML(p.title)}</strong>
+              <span class="badge ${p.status === 'VALIDATED' ? 'badge-secondary' : 'badge-warning'}">
+                ${p.status === 'VALIDATED' ? 'Validé' : (p.status === 'TO_REVISE' ? 'À réviser' : 'En cours')}
+              </span>
+            </div>
+            <div style="font-size: 11px; color: var(--on-surface-variant); margin-top: 4px;">
+              Classe : ${escapeHTML(p.className)} • Échéance : ${escapeHTML(p.deadline)} • Note : <strong>${p.grade || '--'} /20</strong>
+            </div>
+          `;
+          projContainer.appendChild(div);
+        });
+      }
+    }
+
+    function selectClassAndNavigate(className) {
+      const classSelect = document.getElementById('filterStudentClass');
+      if (classSelect) classSelect.value = className;
+      switchTab('tabStudents');
+    }
+
+    function directTakeAttendance(className, slotTime) {
+      const clsElem = document.getElementById('attendanceClassSelect');
+      if (clsElem) clsElem.value = className;
+      const slotElem = document.getElementById('attendanceSlotSelect');
+      if (slotElem) slotElem.value = slotTime;
+      switchTab('tabAttendance');
+    }
+
+    // --- STUDENTS MODULE ---
+    function renderStudentsList() {
+      const levelFilter = document.getElementById('filterStudentLevel').value;
+      const classFilter = document.getElementById('filterStudentClass').value;
+      const searchQuery = (document.getElementById('searchStudentInput').value || '').trim().toLowerCase();
+
+      const tbody = document.getElementById('studentsTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const filtered = appData.students.filter(s => {
+        if (levelFilter !== 'ALL' && s.level !== levelFilter) return false;
+        if (classFilter !== 'ALL' && s.className !== classFilter) return false;
+        if (searchQuery) {
+          const matchMassar = (s.massar || '').toLowerCase().includes(searchQuery);
+          const matchAr = (s.nameAr || '').toLowerCase().includes(searchQuery);
+          const matchFr = (s.nameFr || '').toLowerCase().includes(searchQuery);
+          if (!matchMassar && !matchAr && !matchFr) return false;
+        }
+        return true;
+      });
+
+      const countBadge = document.getElementById('studentsFilterCount');
+      if (countBadge) countBadge.textContent = `Affichage de ${filtered.length} élève(s) sur ${appData.students.length}`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 24px; color: var(--text-muted);">Aucun élève ne correspond aux critères de recherche.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach((s, idx) => {
+        const avg = calculateStudentAverage(s.id);
+        const absences = getStudentAbsenceCount(s.id);
+        const avgDisplay = avg !== null ? `<strong>${avg.toFixed(2)}</strong>` : `<span style="color:var(--text-muted);">--</span>`;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="font-mono" style="font-size: 11px; color: var(--text-muted);">${idx + 1}</td>
+          <td class="font-mono"><strong>${escapeHTML(s.massar)}</strong></td>
+          <td class="font-arabic" style="font-size: 14px; font-weight: 600;">${escapeHTML(s.nameAr)}</td>
+          <td>${escapeHTML(s.nameFr || '--')}</td>
+          <td><span class="badge badge-primary">${escapeHTML(s.className)}</span></td>
+          <td>${s.gender === 'F' ? '<span class="badge badge-warning">F</span>' : '<span class="badge badge-neutral">M</span>'}</td>
+          <td>${avgDisplay}</td>
+          <td>
+            ${absences > 0 ? `<span class="badge ${absences >= 3 ? 'badge-danger' : 'badge-neutral'}">${absences} abs</span>` : '<span style="color:var(--secondary); font-size:11px;">0 abs</span>'}
+          </td>
+          <td>
+            <div class="btn-group">
+              <button class="btn btn-outline btn-sm" onclick="openStudentModal('${s.id}')" title="Modifier la fiche élève">
+                <i data-lucide="edit-3" style="width: 12px; height: 12px;"></i>
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="previewStudentReportCard('${s.id}')" title="Voir le Bulletin">
+                <i data-lucide="file-text" style="width: 12px; height: 12px;"></i>
+              </button>
+              <button class="btn btn-outline btn-sm" style="color: var(--error);" onclick="deleteStudent('${s.id}')" title="Supprimer">
+                <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function applyStudentFilters() {
+      renderStudentsList();
+    }
+
+    function openStudentModal(studentId) {
+      const modal = document.getElementById('studentModalBackdrop');
+      if (!modal) return;
+      const title = document.getElementById('studentModalTitle');
+      const editId = document.getElementById('editStudentId');
+
+      if (studentId) {
+        const student = appData.students.find(s => s.id === studentId);
+        if (!student) return;
+        title.innerHTML = `<i data-lucide="user"></i> Fiche Élève : ${escapeHTML(student.nameAr)}`;
+        editId.value = student.id;
+        document.getElementById('modalStudentMassar').value = student.massar || '';
+        document.getElementById('modalStudentClass').value = student.className || '1APIC-1';
+        document.getElementById('modalStudentNameAr').value = student.nameAr || '';
+        document.getElementById('modalStudentNameFr').value = student.nameFr || '';
+        document.getElementById('modalStudentGender').value = student.gender || 'M';
+        document.getElementById('modalStudentBirth').value = student.birthDate || '2012-05-14';
+        document.getElementById('modalStudentPhone').value = student.phone || '';
+        document.getElementById('modalStudentStatus').value = student.status || '';
+        document.getElementById('modalStudentRemarks').value = student.remarks || '';
+      } else {
+        title.innerHTML = `<i data-lucide="user-plus"></i> Inscription d'un Nouvel Élève`;
+        editId.value = '';
+        document.getElementById('modalStudentMassar').value = '';
+        document.getElementById('modalStudentClass').value = '1APIC-1';
+        document.getElementById('modalStudentNameAr').value = '';
+        document.getElementById('modalStudentNameFr').value = '';
+        document.getElementById('modalStudentGender').value = 'M';
+        document.getElementById('modalStudentBirth').value = '2012-01-01';
+        document.getElementById('modalStudentPhone').value = '';
+        document.getElementById('modalStudentStatus').value = 'R.A.S';
+        document.getElementById('modalStudentRemarks').value = '';
+      }
+
+      modal.classList.add('open');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    async function saveStudentFromModal() {
+      const editId = document.getElementById('editStudentId').value;
+      const massar = document.getElementById('modalStudentMassar').value.trim();
+      const nameAr = document.getElementById('modalStudentNameAr').value.trim();
+      const nameFr = document.getElementById('modalStudentNameFr').value.trim();
+      const className = document.getElementById('modalStudentClass').value;
+      const gender = document.getElementById('modalStudentGender').value;
+      const birthDate = document.getElementById('modalStudentBirth').value;
+      const phone = document.getElementById('modalStudentPhone').value.trim();
+      const status = document.getElementById('modalStudentStatus').value.trim();
+      const remarks = document.getElementById('modalStudentRemarks').value.trim();
+
+      if (!massar || !nameAr) {
+        alert('Le Code Massar et le Nom en arabe sont obligatoires.');
+        return;
+      }
+
+      const level = className.startsWith('1') ? '1ACSC' : (className.startsWith('2') ? '2ACSC' : '3ACSC');
+
+      if (editId) {
+        const student = appData.students.find(s => s.id === editId);
+        if (student) {
+          student.massar = massar;
+          student.nameAr = nameAr;
+          student.nameFr = nameFr;
+          student.className = className;
+          student.level = level;
+          student.gender = gender;
+          student.birthDate = birthDate;
+          student.phone = phone;
+          student.status = status;
+          student.remarks = remarks;
+        }
+      } else {
+        const newId = `STD-${String(appData.students.length + 1).padStart(4, '0')}`;
+        appData.students.push({
+          id: newId,
+          massar,
+          nameAr,
+          nameFr,
+          className,
+          level,
+          gender,
+          birthDate,
+          phone,
+          status,
+          remarks
+        });
+        // Default grades
+        appData.grades[newId] = { cc1: 12, cc2: 12, cc3: 12, ai: 12, remark: 'Nouvel élève inscrit.' };
+      }
+
+      await persistAppState();
+      closeModal('studentModalBackdrop');
+      renderStudentsList();
+      renderDashboard();
+      showToast('Fiche élève enregistrée avec succès.', 'success');
+    }
+
+    async function deleteStudent(studentId) {
+      const student = appData.students.find(s => s.id === studentId);
+      if (!student) return;
+      if (!confirm(`Confirmez-vous la suppression de l'élève "${student.nameAr}" (${student.massar}) ?`)) {
+        return;
+      }
+      appData.students = appData.students.filter(s => s.id !== studentId);
+      delete appData.grades[studentId];
+      await persistAppState();
+      renderStudentsList();
+      renderDashboard();
+      showToast('Élève supprimé.', 'info');
+    }
+
+    // --- CSV IMPORT / EXPORT (STUDENTS) ---
+    function exportStudentsCSV() {
+      const headers = ['Code_Massar', 'Nom_Arabe', 'Nom_Francais', 'Classe', 'Niveau', 'Genre', 'Date_Naissance', 'Telephone', 'Statut'];
+      const rows = appData.students.map(s => [
+        `"${(s.massar || '').replace(/"/g, '""')}"`,
+        `"${(s.nameAr || '').replace(/"/g, '""')}"`,
+        `"${(s.nameFr || '').replace(/"/g, '""')}"`,
+        `"${(s.className || '').replace(/"/g, '""')}"`,
+        `"${(s.level || '').replace(/"/g, '""')}"`,
+        `"${(s.gender || '').replace(/"/g, '""')}"`,
+        `"${(s.birthDate || '').replace(/"/g, '""')}"`,
+        `"${(s.phone || '').replace(/"/g, '""')}"`,
+        `"${(s.status || '').replace(/"/g, '""')}"`
+      ]);
+
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      downloadBlob(csvContent, 'text/csv;charset=utf-8;', `Eleves_College_Aoulouz_${new Date().toISOString().slice(0, 10)}.csv`);
+      showToast('Export CSV des élèves généré.', 'success');
+    }
+
+    function triggerImportCSV() {
+      const input = document.getElementById('csvFileInput');
+      if (input) input.click();
+    }
+
+    function handleCSVFileImport(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const text = e.target.result;
+          const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+          if (lines.length < 2) {
+            alert('Fichier CSV vide ou non conforme.');
+            return;
+          }
+
+          let added = 0;
+          for (let i = 1; i < lines.length; i++) {
+            const cols = parseCSVLine(lines[i]);
+            if (cols.length >= 2 && cols[0]) {
+              const massar = cols[0];
+              const nameAr = cols[1];
+              const nameFr = cols[2] || '';
+              const className = cols[3] || '1APIC-1';
+              const level = className.startsWith('1') ? '1ACSC' : (className.startsWith('2') ? '2ACSC' : '3ACSC');
+              const gender = cols[5] || 'M';
+
+              // check if already exists
+              let existing = appData.students.find(s => s.massar === massar);
+              if (existing) {
+                existing.nameAr = nameAr;
+                existing.nameFr = nameFr;
+                existing.className = className;
+              } else {
+                const newId = `STD-${String(appData.students.length + 1).padStart(4, '0')}`;
+                appData.students.push({
+                  id: newId,
+                  massar,
+                  nameAr,
+                  nameFr,
+                  className,
+                  level,
+                  gender,
+                  birthDate: '2012-01-01',
+                  phone: '',
+                  status: 'R.A.S',
+                  remarks: 'Importé via CSV'
+                });
+                appData.grades[newId] = { cc1: 10, cc2: 10, cc3: 10, ai: 10, remark: 'Passable' };
+                added++;
+              }
+            }
+          }
+
+          await persistAppState();
+          renderStudentsList();
+          renderDashboard();
+          showToast(`Importation réussie : ${added} nouvel(s) élève(s) ajouté(s).`, 'success');
+        } catch (err) {
+          alert('Erreur lors de la lecture du fichier CSV : ' + err.message);
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+      event.target.value = '';
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"' && line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    // --- TIMETABLE MODULE ---
+    function renderTimetable() {
+      const gridBody = document.getElementById('timetableGridBody');
+      if (!gridBody) return;
+      gridBody.innerHTML = '';
+
+      const timeSlots = [
+        '08:30 - 09:30',
+        '09:30 - 10:30',
+        '10:30 - 11:30',
+        '11:30 - 12:30',
+        '14:30 - 15:30',
+        '15:30 - 16:30',
+        '16:30 - 17:30',
+        '17:30 - 18:30'
+      ];
+      const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+      timeSlots.forEach(slot => {
+        const tr = document.createElement('tr');
+        const th = document.createElement('th');
+        th.className = 'time-slot-label';
+        th.textContent = slot;
+        tr.appendChild(th);
+
+        days.forEach(day => {
+          const td = document.createElement('td');
+          td.className = 'session-cell';
+
+          const session = appData.timetable.find(s => s.day === day && s.time === slot);
+          if (session) {
+            let colorCls = 'french-lecture';
+            if (session.activity === 'Langue') colorCls = 'french-langue';
+            else if (session.activity === 'Ecrit') colorCls = 'french-ecrit';
+            else if (session.activity === 'Oral') colorCls = 'french-oral';
+            else if (session.activity === 'Soutien') colorCls = 'french-soutien';
+
+            td.innerHTML = `
+              <div class="session-card ${colorCls}" onclick="directTakeAttendance('${escapeHTML(session.className)}', '${escapeHTML(session.time)}')">
+                <div class="session-title">${escapeHTML(session.className)} • ${escapeHTML(session.activity)}</div>
+                <div class="session-meta">
+                  <span>${escapeHTML(session.room)}</span>
+                  <span>Pointage →</span>
+                </div>
+              </div>
+            `;
+          } else {
+            td.innerHTML = `<span style="color: #cbd5e1; font-size: 11px;">—</span>`;
+          }
+          tr.appendChild(td);
+        });
+
+        gridBody.appendChild(tr);
+      });
+    }
+
+    function openTimetableEditorModal() {
+      const modal = document.getElementById('timetableEditModalBackdrop');
+      if (modal) modal.classList.add('open');
+    }
+
+    async function saveTimetableSession() {
+      const day = document.getElementById('editTtDay').value;
+      const time = document.getElementById('editTtTime').value;
+      const className = document.getElementById('editTtClass').value;
+      const activity = document.getElementById('editTtActivity').value;
+      const room = document.getElementById('editTtRoom').value.trim() || 'Salle 04';
+
+      // replace existing or push
+      appData.timetable = appData.timetable.filter(t => !(t.day === day && t.time === time));
+      appData.timetable.push({ day, time, className, activity, room });
+
+      await persistAppState();
+      closeModal('timetableEditModalBackdrop');
+      renderTimetable();
+      renderDashboard();
+      showToast('Séance enregistrée dans l\'emploi du temps.', 'success');
+    }
+
+    // --- ATTENDANCE MODULE ---
+    function initAttendanceTab() {
+      loadAttendanceSession();
+    }
+
+    function loadAttendanceSession() {
+      const dateVal = document.getElementById('attendanceDateSelect').value;
+      const classVal = document.getElementById('attendanceClassSelect').value;
+      const slotVal = document.getElementById('attendanceSlotSelect').value;
+
+      const tbody = document.getElementById('attendanceTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const classStudents = appData.students.filter(s => s.className === classVal);
+
+      let presentCount = 0;
+      let absentCount = 0;
+      let lateCount = 0;
+
+      classStudents.forEach((student, idx) => {
+        // find record for this session
+        let record = appData.attendance.find(a => a.date === dateVal && a.className === classVal && a.slot === slotVal && a.studentId === student.id);
+        const status = record ? record.status : 'P'; // default present
+        const lateMinutes = record ? (record.minutesLate || 0) : 0;
+        const reason = record ? (record.reason || '') : '';
+
+        if (status === 'P') presentCount++;
+        else if (status === 'A' || status === 'J') absentCount++;
+        else if (status === 'R') lateCount++;
+
+        const totalAbsences = getStudentAbsenceCount(student.id);
+
+        const tr = document.createElement('tr');
+        tr.id = `att-row-${student.id}`;
+        tr.innerHTML = `
+          <td class="font-mono" style="font-size: 11px; color: var(--text-muted);">${idx + 1}</td>
+          <td class="font-mono"><strong>${escapeHTML(student.massar)}</strong></td>
+          <td class="font-arabic" style="font-size: 14px; font-weight: 600;">${escapeHTML(student.nameAr)}</td>
+          <td>${escapeHTML(student.nameFr || '--')}</td>
+          <td style="text-align: center;">
+            <div style="display: inline-flex; gap: 4px;">
+              <button type="button" class="status-toggle-btn present ${status === 'P' ? 'active' : ''}" onclick="setAttendanceStatus('${student.id}', 'P')" title="Présent">P</button>
+              <button type="button" class="status-toggle-btn absent ${status === 'A' ? 'active' : ''}" onclick="setAttendanceStatus('${student.id}', 'A')" title="Absent Injustifié">A</button>
+              <button type="button" class="status-toggle-btn justified ${status === 'J' ? 'active' : ''}" onclick="setAttendanceStatus('${student.id}', 'J')" title="Absent Justifié">J</button>
+              <button type="button" class="status-toggle-btn late ${status === 'R' ? 'active' : ''}" onclick="setAttendanceStatus('${student.id}', 'R')" title="En Retard">R</button>
+            </div>
+          </td>
+          <td>
+            <input type="number" id="late-${student.id}" class="form-input font-mono" min="0" max="60" value="${lateMinutes}" style="width: 70px; padding: 4px;" placeholder="0 min">
+          </td>
+          <td>
+            <input type="text" id="reason-${student.id}" class="form-input" value="${escapeHTML(reason)}" placeholder="Motif ou observation..." style="width: 100%; padding: 4px;">
+          </td>
+          <td>
+            ${totalAbsences >= 3 ? `<span class="badge badge-danger" title="Alerte Absentéisme">${totalAbsences} séances ⚠️</span>` : `<span class="badge badge-neutral">${totalAbsences} séance(s)</span>`}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('sessionCountPresent').textContent = presentCount;
+      document.getElementById('sessionCountAbsent').textContent = absentCount;
+      document.getElementById('sessionCountLate').textContent = lateCount;
+    }
+
+    function setAttendanceStatus(studentId, newStatus) {
+      const row = document.getElementById(`att-row-${studentId}`);
+      if (!row) return;
+
+      row.querySelectorAll('.status-toggle-btn').forEach(btn => btn.classList.remove('active'));
+      if (newStatus === 'P') row.querySelector('.status-toggle-btn.present').classList.add('active');
+      else if (newStatus === 'A') row.querySelector('.status-toggle-btn.absent').classList.add('active');
+      else if (newStatus === 'J') row.querySelector('.status-toggle-btn.justified').classList.add('active');
+      else if (newStatus === 'R') row.querySelector('.status-toggle-btn.late').classList.add('active');
+
+      updateSessionCounters();
+    }
+
+    function markAllPresent() {
+      const tbody = document.getElementById('attendanceTableBody');
+      if (!tbody) return;
+      tbody.querySelectorAll('tr').forEach(row => {
+        row.querySelectorAll('.status-toggle-btn').forEach(b => b.classList.remove('active'));
+        const pBtn = row.querySelector('.status-toggle-btn.present');
+        if (pBtn) pBtn.classList.add('active');
+        const reasonInput = row.querySelector('input[id^="reason-"]');
+        if (reasonInput) reasonInput.value = '';
+        const lateInput = row.querySelector('input[id^="late-"]');
+        if (lateInput) lateInput.value = '0';
+      });
+      updateSessionCounters();
+      showToast('Tous les élèves sont cochés Présents.', 'info');
+    }
+
+    function updateSessionCounters() {
+      const tbody = document.getElementById('attendanceTableBody');
+      if (!tbody) return;
+      let p = 0, a = 0, l = 0;
+      tbody.querySelectorAll('tr').forEach(row => {
+        if (row.querySelector('.status-toggle-btn.present.active')) p++;
+        else if (row.querySelector('.status-toggle-btn.absent.active') || row.querySelector('.status-toggle-btn.justified.active')) a++;
+        else if (row.querySelector('.status-toggle-btn.late.active')) l++;
+      });
+      document.getElementById('sessionCountPresent').textContent = p;
+      document.getElementById('sessionCountAbsent').textContent = a;
+      document.getElementById('sessionCountLate').textContent = l;
+    }
+
+    async function saveCurrentAttendanceSession() {
+      const dateVal = document.getElementById('attendanceDateSelect').value;
+      const classVal = document.getElementById('attendanceClassSelect').value;
+      const slotVal = document.getElementById('attendanceSlotSelect').value;
+      const classStudents = appData.students.filter(s => s.className === classVal);
+
+      // Remove existing records for this specific class and slot
+      appData.attendance = appData.attendance.filter(a => !(a.date === dateVal && a.className === classVal && a.slot === slotVal));
+
+      classStudents.forEach(student => {
+        const row = document.getElementById(`att-row-${student.id}`);
+        if (!row) return;
+
+        let status = 'P';
+        if (row.querySelector('.status-toggle-btn.absent.active')) status = 'A';
+        else if (row.querySelector('.status-toggle-btn.justified.active')) status = 'J';
+        else if (row.querySelector('.status-toggle-btn.late.active')) status = 'R';
+
+        const lateMinutes = parseInt(document.getElementById(`late-${student.id}`).value) || 0;
+        const reason = document.getElementById(`reason-${student.id}`).value.trim();
+
+        appData.attendance.push({
+          date: dateVal,
+          className: classVal,
+          slot: slotVal,
+          studentId: student.id,
+          status,
+          minutesLate: lateMinutes,
+          reason
+        });
+      });
+
+      await persistAppState();
+      renderDashboard();
+      showToast('Séance de présence enregistrée avec succès.', 'success');
+    }
+
+    function printTutorSummons(studentId) {
+      const student = appData.students.find(s => s.id === studentId);
+      if (!student) return;
+      alert(`Génération de la Convocation du Tuteur pour : ${student.nameAr} (${student.massar})\nClasse : ${student.className}\nMotif : Absentéisme répété en cours de Français.\nDocument envoyé vers l'impression A4.`);
+      previewStudentReportCard(studentId);
+    }
+
+    // --- DISCIPLINE MODULE ---
+    function renderDisciplineTable() {
+      const classFilter = document.getElementById('filterDisciplineClass').value;
+      const typeFilter = document.getElementById('filterDisciplineType').value;
+      const tbody = document.getElementById('disciplineTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const filtered = appData.discipline.filter(d => {
+        if (classFilter !== 'ALL' && d.className !== classFilter) return false;
+        if (typeFilter !== 'ALL') {
+          if (typeFilter === 'BONUS' && d.points < 0) return false;
+          if (typeFilter === 'WARNING' && !d.category.includes('WARNING')) return false;
+          if (typeFilter === 'CHATTER' && d.category !== 'CHATTER') return false;
+          if (typeFilter === 'MATERIAL' && d.category !== 'NO_MATERIAL') return false;
+          if (typeFilter === 'DETENTION' && d.measure !== 'Retenue') return false;
+          if (typeFilter === 'SUMMONS' && d.category !== 'SUMMONS') return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 24px; color: var(--text-muted);">Aucun événement disciplinaire enregistré pour ces critères.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(d => {
+        const student = appData.students.find(s => s.id === d.studentId);
+        const isBonus = d.points > 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="font-mono">${escapeHTML(d.date)}</td>
+          <td>
+            <div style="font-weight: 600;">${escapeHTML(student ? student.nameAr : d.studentName)}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${escapeHTML(student ? student.nameFr : '')}</div>
+          </td>
+          <td><span class="badge badge-primary">${escapeHTML(d.className)}</span></td>
+          <td><span class="badge ${isBonus ? 'badge-secondary' : 'badge-danger'}">${escapeHTML(d.category)}</span></td>
+          <td>
+            <strong style="color: ${isBonus ? 'var(--secondary)' : 'var(--error)'};">
+              ${isBonus ? '+' + d.points : d.points} pt(s)
+            </strong>
+          </td>
+          <td style="max-width: 320px;">${escapeHTML(d.description)}</td>
+          <td><strong>${escapeHTML(d.measure)}</strong></td>
+          <td><span class="badge badge-neutral">${escapeHTML(d.status || 'Enregistré')}</span></td>
+          <td>
+            <button class="btn btn-outline btn-sm" style="color: var(--error);" onclick="deleteDisciplineEvent('${d.id}')" title="Supprimer">
+              <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function openDisciplineModal() {
+      const modal = document.getElementById('disciplineModalBackdrop');
+      if (!modal) return;
+      populateDisciplineStudentsDropdown();
+      modal.classList.add('open');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function populateDisciplineStudentsDropdown() {
+      const cls = document.getElementById('discClassSelect').value;
+      const select = document.getElementById('discStudentSelect');
+      if (!select) return;
+      select.innerHTML = '';
+      const list = appData.students.filter(s => s.className === cls);
+      list.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.nameAr} (${s.nameFr || s.massar})`;
+        select.appendChild(opt);
+      });
+    }
+
+    function updateDisciplinePointsHint() {
+      // Automatic default measure hints
+      const cat = document.getElementById('discCategorySelect').value;
+      const meas = document.getElementById('discMeasureSelect');
+      if (!meas) return;
+      if (cat === 'PARTICIPATION_BONUS' || cat === 'HELP_BONUS') meas.value = 'Félicitations';
+      else if (cat === 'CHATTER' || cat === 'NO_MATERIAL') meas.value = 'Rappel à l\'ordre';
+      else if (cat === 'HOMEWORK_MISSING') meas.value = 'Travail supplémentaire';
+      else if (cat === 'INSOLENCE') meas.value = 'Avertissement écrit';
+      else if (cat === 'SUMMONS') meas.value = 'Convocation tuteur';
+    }
+
+    async function saveDisciplineEvent() {
+      const dateVal = document.getElementById('discDateInput').value;
+      const classVal = document.getElementById('discClassSelect').value;
+      const studentId = document.getElementById('discStudentSelect').value;
+      const cat = document.getElementById('discCategorySelect').value;
+      const measure = document.getElementById('discMeasureSelect').value;
+      const desc = document.getElementById('discDescriptionInput').value.trim();
+
+      const student = appData.students.find(s => s.id === studentId);
+      if (!student) {
+        alert('Veuillez sélectionner un élève.');
+        return;
+      }
+
+      let pts = 0;
+      if (cat === 'PARTICIPATION_BONUS') pts = 2;
+      else if (cat === 'HELP_BONUS') pts = 1;
+      else if (cat === 'CHATTER') pts = -1;
+      else if (cat === 'NO_MATERIAL') pts = -1;
+      else if (cat === 'HOMEWORK_MISSING') pts = -2;
+      else if (cat === 'INSOLENCE') pts = -3;
+      else if (cat === 'LATE') pts = -1;
+
+      const newId = `DISC-${String(appData.discipline.length + 1).padStart(3, '0')}`;
+      appData.discipline.unshift({
+        id: newId,
+        date: dateVal,
+        studentId: student.id,
+        studentName: student.nameAr,
+        className: classVal,
+        category: cat,
+        points: pts,
+        description: desc || 'Incident relevé en cours de Français.',
+        measure,
+        status: 'Validé'
+      });
+
+      await persistAppState();
+      closeModal('disciplineModalBackdrop');
+      renderDisciplineTable();
+      renderDashboard();
+      showToast('Événement disciplinaire consigné.', 'success');
+    }
+
+    async function deleteDisciplineEvent(discId) {
+      if (!confirm('Voulez-vous supprimer cet enregistrement disciplinaire ?')) return;
+      appData.discipline = appData.discipline.filter(d => d.id !== discId);
+      await persistAppState();
+      renderDisciplineTable();
+      showToast('Événement supprimé.', 'info');
+    }
+
+    // --- GRADES & EVALUATIONS MODULE ---
+    function renderGradesTable() {
+      const classVal = document.getElementById('gradesClassSelect').value;
+      const tbody = document.getElementById('gradesTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const classStudents = appData.students.filter(s => s.className === classVal);
+
+      let minGrade = 20;
+      let maxGrade = 0;
+      let sumGrade = 0;
+      let passedCount = 0;
+
+      const distribution = {
+        '0-5': 0,
+        '5-10': 0,
+        '10-12': 0,
+        '12-14': 0,
+        '14-16': 0,
+        '16-20': 0
+      };
+
+      classStudents.forEach((student, idx) => {
+        let g = appData.grades[student.id];
+        if (!g) {
+          g = { cc1: 12, cc2: 12, cc3: 12, ai: 12, remark: 'Ensemble convenable.' };
+          appData.grades[student.id] = g;
+        }
+
+        const avg = calculateStudentAverage(student.id);
+
+        if (avg !== null) {
+          if (avg < minGrade) minGrade = avg;
+          if (avg > maxGrade) maxGrade = avg;
+          sumGrade += avg;
+          if (avg >= 10) passedCount++;
+
+          if (avg < 5) distribution['0-5']++;
+          else if (avg < 10) distribution['5-10']++;
+          else if (avg < 12) distribution['10-12']++;
+          else if (avg < 14) distribution['12-14']++;
+          else if (avg < 16) distribution['14-16']++;
+          else distribution['16-20']++;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="font-mono" style="font-size: 11px; color: var(--text-muted);">${idx + 1}</td>
+          <td class="font-mono"><strong>${escapeHTML(student.massar)}</strong></td>
+          <td class="font-arabic" style="font-size: 14px; font-weight: 600;">${escapeHTML(student.nameAr)}</td>
+          <td>${escapeHTML(student.nameFr || '--')}</td>
+          <td>
+            <input type="number" step="0.25" min="0" max="20" class="form-input font-mono" style="width: 80px; text-align: center;" value="${g.cc1 !== undefined ? g.cc1 : ''}" onchange="updateStudentGrade('${student.id}', 'cc1', this.value)">
+          </td>
+          <td>
+            <input type="number" step="0.25" min="0" max="20" class="form-input font-mono" style="width: 80px; text-align: center;" value="${g.cc2 !== undefined ? g.cc2 : ''}" onchange="updateStudentGrade('${student.id}', 'cc2', this.value)">
+          </td>
+          <td>
+            <input type="number" step="0.25" min="0" max="20" class="form-input font-mono" style="width: 80px; text-align: center;" value="${g.cc3 !== undefined ? g.cc3 : ''}" onchange="updateStudentGrade('${student.id}', 'cc3', this.value)">
+          </td>
+          <td>
+            <input type="number" step="0.25" min="0" max="20" class="form-input font-mono" style="width: 80px; text-align: center;" value="${g.ai !== undefined ? g.ai : ''}" onchange="updateStudentGrade('${student.id}', 'ai', this.value)">
+          </td>
+          <td style="text-align: center;">
+            <strong id="avg-display-${student.id}" style="color: ${avg >= 10 ? 'var(--secondary)' : 'var(--error)'}; font-size: 14px;">
+              ${avg !== null ? avg.toFixed(2) : '--'}
+            </strong>
+          </td>
+          <td>
+            <input type="text" class="form-input" style="width: 100%;" value="${escapeHTML(g.remark || '')}" onchange="updateStudentRemark('${student.id}', this.value)" placeholder="Appréciation...">
+          </td>
+          <td style="text-align: center;">
+            <button class="btn btn-outline btn-sm" onclick="previewStudentReportCard('${student.id}')" title="Bulletin individuel">
+              <i data-lucide="file-text" style="width: 12px; height: 12px;"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Update KPI Statistics
+      const classAvg = classStudents.length > 0 ? (sumGrade / classStudents.length).toFixed(2) : '0.00';
+      const passRate = classStudents.length > 0 ? ((passedCount / classStudents.length) * 100).toFixed(1) : '0.0';
+
+      document.getElementById('statsClassAvg').textContent = `${classAvg} /20`;
+      document.getElementById('statsClassMax').textContent = `${classStudents.length > 0 ? maxGrade.toFixed(2) : '--'} /20`;
+      document.getElementById('statsClassMin').textContent = `${classStudents.length > 0 ? minGrade.toFixed(2) : '--'} /20`;
+      document.getElementById('statsPassRate').textContent = `${passRate}%`;
+
+      // Render Distribution Histogram
+      renderHistogram(distribution, classStudents.length);
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function renderHistogram(dist, total) {
+      const container = document.getElementById('gradeDistributionGroup');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const labels = [
+        { key: '0-5', label: '[00 - 05[', color: 'red' },
+        { key: '5-10', label: '[05 - 10[', color: 'amber' },
+        { key: '10-12', label: '[10 - 12[', color: 'green' },
+        { key: '12-14', label: '[12 - 14[', color: 'green' },
+        { key: '14-16', label: '[14 - 16[', color: 'green' },
+        { key: '16-20', label: '[16 - 20]', color: 'green' }
+      ];
+
+      labels.forEach(item => {
+        const count = dist[item.key] || 0;
+        const pct = total > 0 ? ((count / total) * 100).toFixed(0) : 0;
+        const row = document.createElement('div');
+        row.className = 'histogram-row';
+        row.innerHTML = `
+          <span class="font-mono">${item.label}</span>
+          <div class="histogram-track">
+            <div class="histogram-fill ${item.color}" style="width: ${pct}%;"></div>
+          </div>
+          <span class="font-mono" style="text-align: right; font-weight: 600;">${count}</span>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    async function updateStudentGrade(studentId, field, val) {
+      if (!appData.grades[studentId]) appData.grades[studentId] = {};
+      const num = parseFloat(val);
+      appData.grades[studentId][field] = isNaN(num) ? null : Math.max(0, Math.min(20, num));
+
+      // compute automatic remark if empty
+      const avg = calculateStudentAverage(studentId);
+      const display = document.getElementById(`avg-display-${studentId}`);
+      if (display && avg !== null) {
+        display.textContent = avg.toFixed(2);
+        display.style.color = avg >= 10 ? 'var(--secondary)' : 'var(--error)';
+      }
+
+      await persistAppState();
+      renderDashboard();
+    }
+
+    async function updateStudentRemark(studentId, text) {
+      if (!appData.grades[studentId]) appData.grades[studentId] = {};
+      appData.grades[studentId].remark = text.trim();
+      await persistAppState();
+    }
+
+    function exportMassarGradesCSV() {
+      const classVal = document.getElementById('gradesClassSelect').value;
+      const classStudents = appData.students.filter(s => s.className === classVal);
+      const headers = ['Code_Massar', 'Nom_Arabe', 'Nom_Francais', 'Classe', 'Note_CC1', 'Note_CC2', 'Note_CC3', 'Activites_Integrecs', 'Moyenne', 'Appreciation'];
+
+      const rows = classStudents.map(s => {
+        const g = appData.grades[s.id] || {};
+        const avg = calculateStudentAverage(s.id);
+        return [
+          `"${s.massar}"`,
+          `"${(s.nameAr || '').replace(/"/g, '""')}"`,
+          `"${(s.nameFr || '').replace(/"/g, '""')}"`,
+          `"${s.className}"`,
+          `"${g.cc1 !== undefined ? g.cc1 : ''}"`,
+          `"${g.cc2 !== undefined ? g.cc2 : ''}"`,
+          `"${g.cc3 !== undefined ? g.cc3 : ''}"`,
+          `"${g.ai !== undefined ? g.ai : ''}"`,
+          `"${avg !== null ? avg.toFixed(2) : ''}"`,
+          `"${(g.remark || '').replace(/"/g, '""')}"`
+        ];
+      });
+
+      const csv = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      downloadBlob(csv, 'text/csv;charset=utf-8;', `Notes_Massar_${classVal}_Aoulouz_${new Date().toISOString().slice(0, 10)}.csv`);
+      showToast(`Fichier Massar exporté pour la classe ${classVal}.`, 'success');
+    }
+
+    // --- PROJECTS MODULE ---
+    function renderProjectsGrid() {
+      const classFilter = document.getElementById('filterProjectClass').value;
+      const statusFilter = document.getElementById('filterProjectStatus').value;
+      const grid = document.getElementById('projectsCardsGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const filtered = appData.projects.filter(p => {
+        if (classFilter !== 'ALL' && p.className !== classFilter) return false;
+        if (statusFilter !== 'ALL' && p.status !== statusFilter) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; padding: 32px; text-align: center; color: var(--text-muted);">Aucun projet correspondant aux critères.</div>`;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.margin = '0';
+        let badgeCls = 'badge-secondary';
+        let statusText = 'Validé & Noté';
+        if (p.status === 'IN_PROGRESS') { badgeCls = 'badge-primary'; statusText = 'En cours'; }
+        else if (p.status === 'TO_REVISE') { badgeCls = 'badge-warning'; statusText = 'À réviser'; }
+
+        card.innerHTML = `
+          <div class="card-header" style="padding: 12px 16px;">
+            <div>
+              <span class="badge badge-primary">${escapeHTML(p.className)}</span>
+              <span class="badge ${badgeCls}" style="margin-left: 4px;">${statusText}</span>
+            </div>
+            ${p.grade ? `<strong style="color: var(--secondary); font-size: 15px;">${p.grade} /20</strong>` : '<span style="color:var(--text-muted); font-size: 12px;">Non noté</span>'}
+          </div>
+          <div class="card-body" style="padding: 16px;">
+            <h4 style="font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 6px;">${escapeHTML(p.title)}</h4>
+            <p style="font-size: 12px; color: var(--on-surface-variant); margin-bottom: 12px;">${escapeHTML(p.description)}</p>
+            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">
+              <strong>Équipe / Membres :</strong> ${escapeHTML(p.members || 'Classe entière')}
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted);">
+              <strong>Échéance :</strong> ${escapeHTML(p.deadline)}
+            </div>
+          </div>
+          <div style="padding: 8px 16px; border-top: 1px solid var(--outline-variant); background: var(--surface-container-low); display: flex; justify-content: flex-end; gap: 8px;">
+            <button class="btn btn-outline btn-sm" onclick="openProjectModal('${p.id}')">
+              <i data-lucide="edit" style="width: 12px; height: 12px;"></i> Modifier
+            </button>
+            <button class="btn btn-outline btn-sm" style="color: var(--error);" onclick="deleteProject('${p.id}')">
+              <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function openProjectModal(projId) {
+      const modal = document.getElementById('projectModalBackdrop');
+      if (!modal) return;
+      const title = document.getElementById('projectModalTitle');
+      const editId = document.getElementById('editProjectId');
+
+      if (projId) {
+        const p = appData.projects.find(x => x.id === projId);
+        if (!p) return;
+        title.innerHTML = `<i data-lucide="edit"></i> Modifier le Projet`;
+        editId.value = p.id;
+        document.getElementById('projectTitleInput').value = p.title || '';
+        document.getElementById('projectClassSelect').value = p.className || '1APIC-1';
+        document.getElementById('projectStatusSelect').value = p.status || 'IN_PROGRESS';
+        document.getElementById('projectDeadlineInput').value = p.deadline || '2026-12-15';
+        document.getElementById('projectGradeInput').value = p.grade !== undefined ? p.grade : '';
+        document.getElementById('projectMembersInput').value = p.members || '';
+        document.getElementById('projectDescInput').value = p.description || '';
+      } else {
+        title.innerHTML = `<i data-lucide="folder-plus"></i> Nouveau Projet Pédagogique`;
+        editId.value = '';
+        document.getElementById('projectTitleInput').value = '';
+        document.getElementById('projectClassSelect').value = '1APIC-1';
+        document.getElementById('projectStatusSelect').value = 'IN_PROGRESS';
+        document.getElementById('projectDeadlineInput').value = '2026-12-15';
+        document.getElementById('projectGradeInput').value = '';
+        document.getElementById('projectMembersInput').value = '';
+        document.getElementById('projectDescInput').value = '';
+      }
+
+      modal.classList.add('open');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    async function saveProjectFromModal() {
+      const editId = document.getElementById('editProjectId').value;
+      const title = document.getElementById('projectTitleInput').value.trim();
+      const className = document.getElementById('projectClassSelect').value;
+      const status = document.getElementById('projectStatusSelect').value;
+      const deadline = document.getElementById('projectDeadlineInput').value;
+      const grade = parseFloat(document.getElementById('projectGradeInput').value);
+      const members = document.getElementById('projectMembersInput').value.trim();
+      const desc = document.getElementById('projectDescInput').value.trim();
+
+      if (!title) {
+        alert('Le titre du projet est obligatoire.');
+        return;
+      }
+
+      if (editId) {
+        const p = appData.projects.find(x => x.id === editId);
+        if (p) {
+          p.title = title;
+          p.className = className;
+          p.status = status;
+          p.deadline = deadline;
+          p.grade = isNaN(grade) ? null : grade;
+          p.members = members;
+          p.description = desc;
+        }
+      } else {
+        const newId = `PRJ-${String(appData.projects.length + 101)}`;
+        appData.projects.push({
+          id: newId,
+          title,
+          className,
+          status,
+          deadline,
+          grade: isNaN(grade) ? null : grade,
+          members,
+          description: desc
+        });
+      }
+
+      await persistAppState();
+      closeModal('projectModalBackdrop');
+      renderProjectsGrid();
+      renderDashboard();
+      showToast('Projet enregistré avec succès.', 'success');
+    }
+
+    async function deleteProject(projId) {
+      if (!confirm('Confirmez-vous la suppression de ce projet ?')) return;
+      appData.projects = appData.projects.filter(p => p.id !== projId);
+      await persistAppState();
+      renderProjectsGrid();
+      showToast('Projet supprimé.', 'info');
+    }
+
+    // --- PRINT & OFFICIAL DOCUMENTS MODULE (A4 Conforme Massar) ---
+    function switchPrintDocType(type) {
+      currentPrintDocType = type;
+      const examCont = document.getElementById('printExamSelectContainer');
+      const studentCont = document.getElementById('printStudentSelectContainer');
+
+      if (type === 'massar') {
+        if (examCont) examCont.style.display = 'flex';
+        if (studentCont) studentCont.style.display = 'none';
+      } else {
+        if (examCont) examCont.style.display = 'none';
+        if (studentCont) studentCont.style.display = 'flex';
+        populatePrintStudentsList();
+      }
+
+      updatePrintDocumentView();
+    }
+
+    function populatePrintStudentsList() {
+      const cls = document.getElementById('printClassSelect').value;
+      const select = document.getElementById('printStudentSelect');
+      if (!select) return;
+      select.innerHTML = '';
+      const list = appData.students.filter(s => s.className === cls);
+      list.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.nameAr} (${s.nameFr || s.massar})`;
+        select.appendChild(opt);
+      });
+    }
+
+    function triggerQuickPrintMassar() {
+      switchTab('tabPrint');
+      switchPrintDocType('massar');
+      setTimeout(() => window.print(), 300);
+    }
+
+    function previewMassarGradeSheet() {
+      const currentClass = document.getElementById('gradesClassSelect').value;
+      const printSelect = document.getElementById('printClassSelect');
+      if (printSelect) printSelect.value = currentClass;
+      switchTab('tabPrint');
+      switchPrintDocType('massar');
+    }
+
+    function previewStudentReportCard(studentId) {
+      const student = appData.students.find(s => s.id === studentId);
+      if (!student) return;
+      const printClassSelect = document.getElementById('printClassSelect');
+      if (printClassSelect) printClassSelect.value = student.className;
+      switchTab('tabPrint');
+      switchPrintDocType('bulletin');
+      setTimeout(() => {
+        const studSelect = document.getElementById('printStudentSelect');
+        if (studSelect) studSelect.value = student.id;
+        updatePrintDocumentView();
+      }, 50);
+    }
+
+    function updatePrintDocumentView() {
+      const sheet = document.getElementById('a4PrintSheet');
+      if (!sheet) return;
+      const cls = document.getElementById('printClassSelect').value;
+      const classStudents = appData.students.filter(s => s.className === cls);
+
+      if (currentPrintDocType === 'massar') {
+        // EXACT REPLICA OF THE TAROUDANT / AOULOUZ MASSAR PDFS!
+        const examCode = document.getElementById('printExamSelect').value;
+        const examName = examCode === '1' ? 'الفرض الأول' : (examCode === '2' ? 'الفرض الثاني' : (examCode === '3' ? 'الفرض الثالث' : 'الأنشطة المندمجة'));
+        const levelAr = cls.startsWith('1') ? 'الأولى إعدادي مسار دولي' : (cls.startsWith('2') ? 'الثانية إعدادي مسار دولي' : 'الثالثة إعدادي مسار دولي');
+
+        // Split students into two columns exactly like the PDF (approx 17-19 students per column)
+        const half = Math.ceil(classStudents.length / 2);
+        const col1 = classStudents.slice(0, half);
+        const col2 = classStudents.slice(half);
+
+        function buildColHTML(studentsSubset) {
+          let rows = '';
+          studentsSubset.forEach(s => {
+            const g = appData.grades[s.id] || {};
+            let mark = '';
+            if (examCode === '1' && g.cc1 !== undefined) mark = g.cc1;
+            else if (examCode === '2' && g.cc2 !== undefined) mark = g.cc2;
+            else if (examCode === '3' && g.cc3 !== undefined) mark = g.cc3;
+            else if (examCode === 'AI' && g.ai !== undefined) mark = g.ai;
+
+            rows += `
+              <tr>
+                <td class="font-mono center" style="width: 90px;">${escapeHTML(s.massar)}</td>
+                <td style="font-weight: 600;">${escapeHTML(s.nameAr)}</td>
+                <td class="font-mono center" style="width: 50px; font-weight: bold;">${mark !== '' ? mark : ''}</td>
+              </tr>
+            `;
+          });
+
+          return `
+            <table class="massar-table">
+              <thead>
+                <tr>
+                  <th style="width: 90px;">رقم التلميذ</th>
+                  <th>اسم التلميذ</th>
+                  <th style="width: 50px;">النقطة</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows}
+              </tbody>
+            </table>
+          `;
+        }
+
+        sheet.innerHTML = `
+          <div class="massar-doc-header">
+            <div class="massar-doc-title">مطبوع نقط المراقبة المستمرة</div>
+            <div class="massar-meta-grid">
+              <div class="massar-meta-item"><span>أكاديمية :</span> <strong>سوس - ماسة</strong></div>
+              <div class="massar-meta-item"><span>المستوى :</span> <strong>${levelAr}</strong></div>
+              <div class="massar-meta-item"><span>السنة الدراسية :</span> <strong>2026/2027</strong></div>
+              <div class="massar-meta-item"><span>م.الإقليمية :</span> <strong>إقليم: تارودانت</strong></div>
+              <div class="massar-meta-item"><span>القسم :</span> <strong>${escapeHTML(cls)}</strong></div>
+              <div class="massar-meta-item"><span>الدورة :</span> <strong>الدورة الأولى</strong></div>
+              <div class="massar-meta-item"><span>مؤسسة :</span> <strong>ثإ. اولوز</strong></div>
+              <div class="massar-meta-item"><span>المادة :</span> <strong>اللغة الفرنسية</strong></div>
+              <div class="massar-meta-item"><span>المراقبة المستمرة :</span> <strong>${examName}</strong></div>
+            </div>
+          </div>
+
+          <div class="massar-two-col-layout">
+            <div>${buildColHTML(col1)}</div>
+            <div>${buildColHTML(col2)}</div>
+          </div>
+
+          <div class="massar-signatures">
+            <div>الأستاذ : <strong>${escapeHTML(appData.teacher.name)}</strong></div>
+            <div>الإدارة :</div>
+          </div>
+        `;
+      } else {
+        // Individual Student Report Card
+        const studentId = document.getElementById('printStudentSelect').value;
+        const student = appData.students.find(s => s.id === studentId) || classStudents[0];
+        if (!student) {
+          sheet.innerHTML = `<div style="padding: 40px; text-align: center;">Veuillez sélectionner un élève valide.</div>`;
+          return;
+        }
+
+        const g = appData.grades[student.id] || {};
+        const avg = calculateStudentAverage(student.id);
+        const absences = getStudentAbsenceCount(student.id);
+        const unjustified = getStudentUnjustifiedAbsences(student.id);
+        const behaviorScore = getStudentBehaviorScore(student.id);
+
+        sheet.innerHTML = `
+          <div class="report-card-header">
+            <div style="font-size: 11px; text-align: left;">
+              <strong>ROYAUME DU MAROC</strong><br>
+              MINISTÈRE DE L'ÉDUCATION NATIONALE<br>
+              AREF SOUSS-MASSA • DP TAROUDANT<br>
+              <strong>COLLÈGE AOULOUZ</strong>
+            </div>
+            <div class="report-header-emblem">
+              <span style="font-size: 14px; font-weight: bold; color: var(--primary);">RELEVÉ DE SUIVI PÉDAGOGIQUE INDIVIDUEL</span><br>
+              <span>بطاقة التتبع والتقويم الفردي — مادة اللغة الفرنسية</span><br>
+              <span class="font-mono" style="font-size: 11px;">Année Scolaire 2026/2027 — Semestre 1</span>
+            </div>
+            <div style="font-size: 11px; text-align: right; direction: rtl; font-family: var(--font-arabic);">
+              <strong>المملكة المغربية</strong><br>
+              وزارة التربية الوطنية والتعليم الأولي والرياضة<br>
+              أكاديمية سوس ماسة • مديرية تارودانت<br>
+              <strong>ثانوية اولوز الإعدادية</strong>
+            </div>
+          </div>
+
+          <div class="report-student-box">
+            <div class="report-student-photo">
+              ${student.gender === 'F' ? '👧' : '👦'}
+            </div>
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--primary);">${escapeHTML(student.nameFr || '')}</h3>
+                <h3 class="font-arabic" style="font-size: 18px; font-weight: 700; color: #047857;">${escapeHTML(student.nameAr)}</h3>
+              </div>
+              <div style="display: flex; gap: 16px; font-size: 12px; margin-top: 4px; color: var(--on-surface-variant); flex-wrap: wrap;">
+                <span>Code Massar : <strong class="font-mono">${escapeHTML(student.massar)}</strong></span>
+                <span>Classe : <strong>${escapeHTML(student.className)}</strong></span>
+                <span>Niveau : <strong>${escapeHTML(student.level)}</strong></span>
+                <span>Né(e) le : <strong>${escapeHTML(student.birthDate)}</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grades Table -->
+          <h4 style="font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 6px; text-transform: uppercase;">
+            1. Évaluations des Épreuves & Contrôles Continus (Langue Française)
+          </h4>
+          <table class="data-table" style="margin-bottom: 16px; border: 1px solid #333;">
+            <thead>
+              <tr style="background: #f1f5f9;">
+                <th>Épreuve</th>
+                <th>Coefficient</th>
+                <th>Note (/20)</th>
+                <th>Appréciation du Professeur</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Contrôle Continu 1 (CC 1)</strong></td>
+                <td class="font-mono">${appData.settings.coefCC1}</td>
+                <td class="font-mono"><strong>${g.cc1 !== undefined ? g.cc1 : '--'}</strong> /20</td>
+                <td>Compréhension de texte et outils de langue</td>
+              </tr>
+              <tr>
+                <td><strong>Contrôle Continu 2 (CC 2)</strong></td>
+                <td class="font-mono">${appData.settings.coefCC2}</td>
+                <td class="font-mono"><strong>${g.cc2 !== undefined ? g.cc2 : '--'}</strong> /20</td>
+                <td>Production de l'écrit et syntaxe</td>
+              </tr>
+              <tr>
+                <td><strong>Contrôle Continu 3 (CC 3)</strong></td>
+                <td class="font-mono">${appData.settings.coefCC3}</td>
+                <td class="font-mono"><strong>${g.cc3 !== undefined ? g.cc3 : '--'}</strong> /20</td>
+                <td>Évaluation sommative périodique</td>
+              </tr>
+              <tr>
+                <td><strong>Activités Intégrées (AI) & Oral</strong></td>
+                <td class="font-mono">${appData.settings.coefAI}</td>
+                <td class="font-mono"><strong>${g.ai !== undefined ? g.ai : '--'}</strong> /20</td>
+                <td>Participation orale, projets, devoirs à la maison</td>
+              </tr>
+              <tr style="background: #f8fafc; border-top: 2px solid #000;">
+                <td colspan="2" style="font-weight: 700; font-size: 14px;">MOYENNE GÉNÉRALE DU SEMESTRE</td>
+                <td colspan="2" style="font-size: 16px; font-weight: 700; color: ${avg >= 10 ? '#047857' : '#dc2626'};">
+                  ${avg !== null ? avg.toFixed(2) : '--'} /20
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Attendance & Behavior Summary -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
+            <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 10px;">
+              <h4 style="font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 6px;">2. Assiduité et Ponctualité</h4>
+              <div style="font-size: 12px; line-height: 1.6;">
+                <div>Total Absences : <strong>${absences} séance(s)</strong></div>
+                <div>Absences non justifiées : <strong style="color: ${unjustified > 0 ? '#dc2626' : '#047857'};">${unjustified} séance(s)</strong></div>
+                <div>Statut : <strong>${absences >= 3 ? 'Alerte Absentéisme — Convocation requise' : 'Assiduité normale'}</strong></div>
+              </div>
+            </div>
+
+            <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 10px;">
+              <h4 style="font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 6px;">3. Conduite & Climat Scolaire</h4>
+              <div style="font-size: 12px; line-height: 1.6;">
+                <div>Score de Comportement : <strong>${behaviorScore} /20</strong></div>
+                <div>Mention : <strong>${behaviorScore >= 16 ? 'Très bonne conduite' : (behaviorScore >= 12 ? 'Conduite convenable' : 'Rappels à l\'ordre répétés')}</strong></div>
+                <div>Travaux de groupe : <strong>Impliqué(e) et coopératif(ve)</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Overall Teacher Remark -->
+          <div style="border: 1px solid #000; border-radius: 4px; padding: 10px; margin-bottom: 24px;">
+            <h4 style="font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 4px;">Appréciation Générale du Professeur (Prof. Kellouch Abdelghani) :</h4>
+            <p style="font-size: 13px; font-style: italic;">"${g.remark || 'Élève sérieux, poursuivre les efforts avec assiduité et régularité.'}"</p>
+          </div>
+
+          <!-- Official Signatures -->
+          <div style="display: flex; justify-content: space-between; margin-top: 30px; padding: 0 30px; font-size: 13px;">
+            <div style="text-align: center;">
+              <strong>Signature & Cachet du Professeur</strong><br>
+              Prof. Kellouch Abdelghani<br><br><br>
+              ............................................
+            </div>
+            <div style="text-align: center;">
+              <strong>Visa de l'Administration Scolaire</strong><br>
+              Collège Aoulouz — ثإ. اولوز<br><br><br>
+              ............................................
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // --- BACKUP & RESTORATION MODULE (JSON) ---
+    function exportDatabaseJSON() {
+      const dataStr = JSON.stringify(appData, null, 2);
+      const filename = `Sauvegarde_College_Aoulouz_${new Date().toISOString().slice(0, 10)}.json`;
+      downloadBlob(dataStr, 'application/json', filename);
+      showToast('Sauvegarde JSON complète téléchargée.', 'success');
+    }
+
+    function triggerImportJSON() {
+      const input = document.getElementById('jsonFileInput');
+      if (input) input.click();
+    }
+
+    function handleJSONFileImport(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && parsed.students && Array.isArray(parsed.students)) {
+            appData = parsed;
+            await persistAppState();
+            applyTeacherProfileData();
+            renderDashboard();
+            renderStudentsList();
+            renderTimetable();
+            initAttendanceTab();
+            renderDisciplineTable();
+            renderGradesTable();
+            renderProjectsGrid();
+            updatePrintDocumentView();
+            showToast('Base de données restaurée avec succès !', 'success');
+          } else {
+            alert('Format de fichier JSON non reconnu pour le Collège Aoulouz.');
+          }
+        } catch (err) {
+          alert('Fichier JSON invalide : ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    async function resetToOfficialDemoData() {
+      if (!confirm('Voulez-vous réinitialiser toutes les données avec le jeu complet et officiel du Collège Aoulouz ?')) {
+        return;
+      }
+      appData = getOfficialAoulouzDemoData();
+      await persistAppState();
+      applyTeacherProfileData();
+      renderDashboard();
+      renderStudentsList();
+      renderTimetable();
+      initAttendanceTab();
+      renderDisciplineTable();
+      renderGradesTable();
+      renderProjectsGrid();
+      updatePrintDocumentView();
+      showToast('Données officielles du Collège Aoulouz réinitialisées.', 'success');
+    }
+
+    // Generic Blob download helper
+    function downloadBlob(content, contentType, filename) {
+      // Check if shim triggers download
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === 'function') {
+          window.notebookAppApi.triggerFileDownload({
+            content,
+            contentType,
+            encoding: 'utf-8',
+            filename
+          });
+          return;
+        }
+      } catch (e) {}
+
+      // Browser fallback
+      const blob = new Blob([content], { type: contentType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 200);
+    }
+
+    // --- Modal Management Helpers ---
+    function showQuickModal(type) {
+      if (type === 'backupModal') {
+        const modal = document.getElementById('backupModalBackdrop');
+        if (modal) modal.classList.add('open');
+      }
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.classList.remove('open');
+    }
+
+    // Close modal on click outside window
+    window.addEventListener('click', function(e) {
+      if (e.target && e.target.classList.contains('modal-backdrop')) {
+        e.target.classList.remove('open');
+      }
+    });
+
+    // --- App Startup ---
+    window.addEventListener('DOMContentLoaded', () => {
+      initAppState();
+    });
+  </script>
+</body>
+</html>
